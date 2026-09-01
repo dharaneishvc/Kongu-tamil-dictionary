@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ta" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>பங்களிக்க · Contribute — கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary</title>
+<meta name="description" content="கொங்கு வட்டார வழக்கு அகராதியில் புதிய சொற்களைச் சேர்ப்பது, திருத்துவது, படம் இணைப்பது எப்படி. How to add, edit and improve entries in the Kongu Tamil dictionary dataset.">
+<meta name="theme-color" content="#7a3d12">
+<link rel="canonical" href="https://dharaneishvc.github.io/Kongu-tamil-dictionary/contribute.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/contribute.html">
+<meta property="og:title" content="பங்களிக்க — கொங்கு வட்டார வழக்கு அகராதி · Contribute — Kongu Tamil Dialect Dictionary">
+<meta property="og:description" content="கொங்கு வட்டார வழக்கு அகராதியில் புதிய சொற்களைச் சேர்ப்பது, திருத்துவது, படம் இணைப்பது எப்படி. How to add, edit and improve entries.">
+<meta property="og:site_name" content="Kongu Tamil Dialect Dictionary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="பங்களிக்க — கொங்கு வட்டார வழக்கு அகராதி · Contribute — Kongu Tamil Dialect Dictionary">
+<meta name="twitter:description" content="கொங்கு வட்டார வழக்கு அகராதியில் புதிய சொற்களைச் சேர்ப்பது, திருத்துவது, படம் இணைப்பது எப்படி. How to add, edit and improve entries.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E0%AE%95%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css?v=2">
+<script>
+  // applied before paint so the page never flashes the wrong theme
+  document.documentElement.dataset.theme =
+    localStorage.getItem('kongu.theme') ||
+    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+</script>
+</head>
+<body>
+<a class="skip-link" href="#guide">உள்ளடக்கத்திற்குச் செல்</a>
+
+<header class="masthead">
+  <div class="shell masthead__inner">
+    <a class="brand" href="index.html">
+      <span class="brand__mark" aria-hidden="true">க</span>
+      <span class="brand__text">
+        <strong>கொங்கு வட்டார வழக்கு அகராதி</strong>
+        <small>Kongu Tamil Dialect Dictionary</small>
+      </span>
+    </a>
+    <div class="masthead__actions">
+      <a class="btn btn--ghost" href="index.html">← அகராதி · Dictionary</a>
+      <button type="button" class="btn btn--ghost" data-action="theme" aria-label="நிறத்தை மாற்று · Toggle colour theme">
+        <span aria-hidden="true">◐</span>
+      </button>
+      <a class="btn btn--ghost" href="https://github.com/dharaneishvc/Kongu-tamil-dictionary/blob/main/data/entries.csv">CSV</a>
+    </div>
+  </div>
+</header>
+
+<main class="shell page">
+  <header class="page__head">
+    <h1>பங்களிக்க · How to contribute</h1>
+    <p class="page__lede">
+      இந்த அகராதி இரண்டு முக்கிய CSVகளால் கட்டமைக்கப்படுகிறது —
+      <a href="https://github.com/dharaneishvc/Kongu-tamil-dictionary/blob/main/data/entries.csv"><code>data/entries.csv</code></a>
+      மற்றும்
+      <a href="https://github.com/dharaneishvc/Kongu-tamil-dictionary/blob/main/data/categories.csv"><code>data/categories.csv</code></a>.
+      முதன்மை உள்ளடக்கம் ஒரு கோப்பில் இருக்கிறது; குழுமப் பெயர்கள் ஒரு மாஸ்டர் CSV-இல்
+      பராமரிக்கப்படுகின்றன. இது <code>category_id</code> (Foreign key)
+      வழியாக இணைக்கப்படுகிறது; புதிய பிரிவு சேர்க்கப்பட்டால், வடிகட்டியில் தானாகவே
+      தெரியும்.
+    </p>
+    <p class="page__lede muted">
+      The dictionary is structured around two CSV files: the main dataset at
+      <a href="https://github.com/dharaneishvc/Kongu-tamil-dictionary/blob/main/data/entries.csv"><code>data/entries.csv</code></a>
+      and the category master at
+      <a href="https://github.com/dharaneishvc/Kongu-tamil-dictionary/blob/main/data/categories.csv"><code>data/categories.csv</code></a>.
+      Entries point to a category via a foreign key such as <code>category_id</code>.
+      Any new active group added there appears in the filters automatically; the first
+      view still starts with <strong>All</strong> selected.
+    </p>
+  </header>
+
+  <nav class="toc" aria-label="இந்தப் பக்கத்தில்">
+    <a href="#quick">விரைவு வழி · Quick route</a>
+    <a href="#add">புதிய சொல் · New word</a>
+    <a href="#edit">திருத்துதல் · Edit</a>
+    <a href="#merge">இரட்டிப்பை இணைத்தல் · Merge duplicates</a>
+    <a href="#columns">நெடுவரிசைகள் · Columns</a>
+    <a href="#images">படங்கள் · Images</a>
+    <a href="#rules">வடிவ விதிகள் · Format rules</a>
+    <a href="#local">உள்ளூரில் சோதிக்க · Test locally</a>
+    <a href="#checklist">சரிபார்ப்புப் பட்டியல் · Checklist</a>
+  </nav>
+
+  <article id="guide" class="page__body">
+
+    <section id="quick">
+      <h2>விரைவு வழி · The fastest route</h2>
+      <p>கணினியில் எதையும் நிறுவ வேண்டியதில்லை. GitHub-இல் நேரடியாகவே திருத்தலாம். No local installation is required; you can edit the files directly on GitHub:</p>
+      <ol class="steps">
+        <li><a href="https://github.com/dharaneishvc/Kongu-tamil-dictionary/blob/main/data/entries.csv"><code>data/entries.csv</code></a> கோப்பைத் திறக்கவும் · Open <code>data/entries.csv</code>.</li>
+        <li>✏️ <strong>Edit</strong> பொத்தானை அழுத்தவும் · Select <strong>Edit</strong>.</li>
+        <li>உங்கள் மாற்றத்தைச் செய்யவும் · Make your change.</li>
+        <li><strong>Commit changes</strong> → <strong>Propose changes</strong> · Commit and propose the change.</li>
+        <li><strong>Create pull request</strong> — அவ்வளவுதான் · Create a pull request.</li>
+      </ol>
+      <p class="callout">
+        <strong>உறுதியில்லையா? Not sure?</strong> பரவாயில்லை.
+        ஆத்தா சொன்ன அரைகுறையாக நினைவிருக்கும் சொல் கூட மதிப்புமிக்கத் தரவே. Even an uncertain word remembered from family speech can be valuable data.
+      </p>
+    </section>
+
+    <section id="add">
+      <h2>1 · புதிய சொல்லைச் சேர்க்க · Add a new word</h2>
+      <p>
+        <strong>முதலில் தேடுங்கள் · Search first.</strong> தேடல் எழுத்துப்பிழைகளைப் பொருட்படுத்தாது —
+        <code>பொடக்காலி</code>, <code>podakkaali</code>, <code>potakkali</code> மூன்றும் ஒரே
+        சொல்லுக்கே அழைத்துச் செல்லும். ஏற்கெனவே இருந்தால், சேர்க்காமல் <a href="#edit">அதைத் திருத்துங்கள்</a>.
+        The search tolerates spelling differences. If the word already exists, edit that entry instead of adding a duplicate.
+      </p>
+      <p>இல்லையெனில், கோப்பின் கடைசியில் ஒரு வரியைச் சேர்க்கவும். Otherwise, add one row at the end of the file:</p>
+      <pre class="code"><code>id,headword,variants,latin,latin_variants,meaning_ta,meaning_en,examples,…
+    ,ஒல்லு,,ollu,,நெல் குத்தும் செக்கு,husking mill,ஒல்லுல நெல்லக் குத்திட்டு வா,…</code></pre>
+      <ul>
+        <li><code>id</code> நெடுவரிசையை <strong>காலியாக விடுங்கள்</strong> · Leave <code>id</code> blank; it will be assigned during review.</li>
+        <li>குறைந்தபட்சத் தேவை: <code>headword</code> + <code>meaning_ta</code> · Minimum required fields: <code>headword</code> and <code>meaning_ta</code>.</li>
+        <li>ஒரு <code>examples</code> வாக்கியம் சொல்லின் பயன்பாட்டைக் காட்டும் · An <code>examples</code> sentence is especially valuable because it shows the word in use.</li>
+      </ul>
+    </section>
+
+    <section id="edit">
+      <h2>2 · இருக்கும் வரியைத் திருத்த · Edit an entry</h2>
+      <ol class="steps">
+        <li>தளத்தில் சொல்லைத் தேடி அட்டையைத் திறக்கவும்; கீழே <code>123</code> போன்ற எண் வடிவ <strong>id</strong> தெரியும். Search for the word and note its numeric id.</li>
+        <li>CSV-இல் <kbd>Ctrl</kbd>+<kbd>F</kbd> மூலம் அதே id-ஐத் தேடவும். Find the same id in the CSV.</li>
+        <li>அந்த வரியை மட்டும் திருத்தவும் · Edit only that row.</li>
+      </ol>
+      <p class="callout callout--warn">
+        <strong>id-ஐ மாற்ற வேண்டாம் · Do not change the id.</strong> <code>#/w/123</code> போன்ற பகிரப்பட்ட
+        இணைப்புகள் அதைச் சார்ந்திருக்கின்றன. Shared links depend on it.
+      </p>
+      <p>ஒரு சொல்லுக்குப் புதிய பொருள் சேர்ப்பது என்றால், புது வரி உருவாக்காமல் — அதே கட்டத்திலேயே சேர்த்துக்கொள்ளுங்கள். To add a meaning, extend the existing field instead of creating a new row:</p>
+      <pre class="code"><code>- 123,கோடு,,kootu,,கடைசி,…
++ 123,கோடு,,kootu,,கடைசி | பக்கம் உயர்ந்த அடுப்பு,…</code></pre>
+    </section>
+
+    <section id="merge">
+      <h2>3 · இரட்டிப்பான வரிகளை இணைக்க · Merge duplicates</h2>
+      <p>ஒரே சொல் இரண்டு வரிகளில் இருப்பது பிழை. இதைச் சரிசெய்ய · If the same word appears twice, merge the entries:</p>
+      <ol class="steps">
+        <li><strong>சிறிய id உள்ள</strong> வரியை வைத்துக்கொள்ளுங்கள் · Keep the row with the smaller id.</li>
+        <li>மற்ற வரியின் பொருள், வடிவங்கள், எடுத்துக்காட்டுகளை <code>|</code> கொண்டு அதனுள் சேர்க்கவும் · Combine meanings, variants and examples using <code>|</code>.</li>
+        <li>இரண்டாவது வரியை முழுமையாக நீக்கவும் · Delete the second row completely.</li>
+      </ol>
+    </section>
+
+    <section id="columns">
+      <h2>4 · நெடுவரிசைகள் · Column reference</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Column · நெடுவரிசை</th><th>Required? · கட்டாயமா?</th><th>Description · விளக்கம்</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>auto</td><td>நிலையான எண் அடையாளம் (<code>1</code>, <code>2</code> போன்றவை). புதிய வரிக்குக் காலி; திருத்தும்போது மாற்றக்கூடாது.</td></tr>
+            <tr><td><code>headword</code></td><td class="req">✔</td><td>தலைச்சொல், தமிழ் எழுத்தில். ஒரு வரிக்கு ஒன்று மட்டும் · The Tamil headword; one per row.</td></tr>
+            <tr><td><code>variants</code></td><td>—</td><td>அதே சொல்லின் வேறு வடிவங்கள்/எழுத்துமுறைகள் · Alternate forms or spellings.</td></tr>
+            <tr><td><code>latin</code></td><td>—</td><td>ஆங்கில எழுத்தில் ஒலிபெயர்ப்பு; மொழிபெயர்ப்பு அல்ல · Phonetic Latin romanization, not a translation.</td></tr>
+            <tr><td><code>latin_variants</code></td><td>—</td><td>ஆங்கில எழுத்தில் தட்டச்சு செய்யக்கூடிய மாற்று வடிவங்கள் · Alternate Latin spellings people may type.</td></tr>
+            <tr><td><code>meaning_ta</code></td><td class="req">✔</td><td>தமிழ்ப் பொருள்; பல பொருள்களுக்கு <code>|</code> பிரிப்பு · Tamil meaning; separate multiple meanings with <code>|</code>.</td></tr>
+            <tr><td><code>meaning_en</code></td><td>—</td><td>ஆங்கிலப் பொருள் · English gloss.</td></tr>
+            <tr><td><code>examples</code></td><td>—</td><td>வழக்கு வாக்கியங்கள்; பலவற்றுக்கு <code>|</code> பிரிப்பு · Usage sentences; separate multiple examples with <code>|</code>.</td></tr>
+            <tr><td><code>word_type</code></td><td>—</td><td>பெயர்ச்சொல் / வினைச்சொல் / உரிச்சொல் · Noun / verb / adjective, and so on.</td></tr>
+            <tr><td><code>category_id</code></td><td class="req">✔</td><td>முதன்மை பிரிவு குறியீடு; <code>data/categories.csv</code>-இன் <code>id</code>-யைச் சுட்டும் Foreign key · Category foreign key pointing to an <code>id</code> in <code>data/categories.csv</code>.</td></tr>
+            <tr><td><code>notes</code></td><td>—</td><td>சொற்பிறப்பு, வட்டார வேறுபாடு, ஐயங்கள் · Etymology, regional notes or uncertainties.</td></tr>
+            <tr><td><code>image</code></td><td>—</td><td><code>images/</code>-இல் உள்ள கோப்புப் பெயர் மட்டும் · The filename in <code>images/</code>, such as <code>ollu.jpg</code>, not a path.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="images">
+      <h2>5 · படம் சேர்க்க · Add an image</h2>
+      <p>
+        <strong>குழுமம் / Category setup:</strong> புதிய குழுமம் தேவை என்றால்
+        <a href="https://github.com/dharaneishvc/Kongu-tamil-dictionary/blob/main/data/categories.csv"><code>data/categories.csv</code></a>
+        கோப்பில் ஒரு வரிசை சேர்க்கவும். அதில் <code>id</code>, <code>label_ta</code>,
+        <code>label_en</code>, <code>is_active</code> ஆகியவை இருக்க வேண்டும். <code>is_active=1</code>
+        என்றால் அந்தக் குழுமம் வடிகட்டியில் தானாகத் தோன்றும். An active category appears in the filters automatically.
+      </p>
+      <ol class="steps">
+        <li>படத்தை <code>images/</code> கோப்புறையில் பதிவேற்றவும் — சிறிய எழுத்துப் பெயர், இடைவெளி இல்லாமல் (<code>ollu.jpg</code>) · Upload it to <code>images/</code> with a lowercase name and no spaces.</li>
+        <li>JPG அல்லது WebP, குறைந்தது 800px அகலம், ~300 KB-க்குள் · Use JPG or WebP, at least 800px wide and about 300 KB or less.</li>
+        <li>அந்தச் சொல்லின் <code>image</code> கட்டத்தில் <strong>கோப்புப் பெயரை மட்டும்</strong> எழுதவும் · Put only the filename in the entry's <code>image</code> field.</li>
+      </ol>
+      <p>
+        தளம் தானாகவே அதை அட்டையில் சிறு படமாகவும், விவரப் பலகத்தில் முழு அகலத்திலும் காட்டும்.
+        The site will display it automatically; no code change is needed.
+      </p>
+      <p class="callout callout--warn">
+        படம் நீங்கள் எடுத்ததாக, அல்லது வணிகப் பயன்பாட்டுக்கும் அனுமதிக்கும் உரிமத்தில்
+        இருக்க வேண்டும். உங்களுடையது இல்லையெனில் மூலத்தை <code>notes</code>-இல் குறிக்கவும். Use an image you created or one with a licence that permits reuse; credit other sources in <code>notes</code>.
+      </p>
+    </section>
+
+    <section id="rules">
+      <h2>6 · CSV வடிவ விதிகள் · CSV format rules</h2>
+      <ul class="rules">
+        <li><strong>ஒரு சொல்லுக்கு ஒரே வரி · One row per word.</strong> சேர்ப்பதற்கு முன் தேடுங்கள் · Search before adding.</li>
+        <li><strong>ஒரு கட்டத்தில் பல மதிப்புகள் · Multiple values.</strong> <code>|</code> கொண்டு பிரிக்கவும் — கமா அல்ல · Use <code>|</code>, not commas.</li>
+        <li><strong>கமா அல்லது மேற்கோள் உள்ள கட்டத்தை</strong> <code>"…"</code>-க்குள் வைக்கவும்.
+            உள்ளே ஒரு <code>"</code> வேண்டுமெனில் இரட்டிக்கவும்: <code>""</code>.</li>
+        <li><strong>UTF-8, BOM இல்லாமல்.</strong> Excel-இல் <em>CSV UTF-8</em> எனச் சேமிக்கவும் —
+            சாதாரண “CSV” தமிழை சிதைக்கும். LibreOffice Calc / Google Sheets பாதுகாப்பானவை.</li>
+        <li><strong>தலைப்பு வரியையோ நெடுவரிசை வரிசையையோ மாற்ற வேண்டாம் · Do not change the header or column order.</strong></li>
+        <li><strong>ஐயமிருந்தால் சொல்லுங்கள் · State uncertainty.</strong> <code>notes</code>-இல் “உறுதிப்படுத்தப்படவில்லை” எனக் குறிப்பிடுங்கள்; யூகத்தை உண்மையாகச் சேர்க்க வேண்டாம் · Mark uncertain information instead of presenting guesses as facts.</li>
+      </ul>
+    </section>
+
+    <section id="local">
+      <h2>7 · உள்ளூரில் சோதிக்க · Test locally</h2>
+      <p>
+        பக்கம் CSV-ஐ <code>fetch()</code> மூலம் ஏற்றுவதால், கோப்பை நேரடியாக உலாவியில் திறக்க முடியாது.
+        The page loads CSV files with <code>fetch()</code>, so it needs a small local server:
+      </p>
+      <pre class="code"><code>python -m http.server 8000
+# http://localhost:8000</code></pre>
+      <p class="muted"><code>npx serve</code>, <code>php -S localhost:8000</code>, VS Code Live Server — எதுவும் நடக்கும் · Any of these will work.</p>
+    </section>
+
+    <section id="checklist">
+      <h2>8 · அனுப்பும் முன் · Review checklist</h2>
+      <ul class="checklist">
+        <li>சொல் ஏற்கெனவே இல்லை என இரு எழுத்துமுறையிலும் தேடிச் சரிபார்த்தேன் · I searched both scripts for an existing entry.</li>
+        <li>நெடுவரிசைகளின் எண்ணிக்கை மாறவில்லை (12) · The column count is still 12.</li>
+        <li>கமா உள்ள கட்டங்கள் மேற்கோளுக்குள் உள்ளன · Fields containing commas are quoted.</li>
+        <li>திருத்தத்தில் <code>id</code> தொடப்படவில்லை; புதிய வரியில் காலி · Existing <code>id</code> values were not changed; new ids are blank.</li>
+        <li>தளத்தை உள்ளூரில் ஏற்றிப் பார்த்தேன், வரி சரியாகத் தெரிகிறது · I tested the page locally and checked the entry.</li>
+        <li>பொருள் தமிழில்; ஆங்கிலம் இருந்தால் <code>meaning_en</code>-இல் · The meaning is in Tamil, with English in <code>meaning_en</code> when available.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>உரிமம் · Licence</h2>
+      <p class="muted">
+        தரவுத்தொகுப்புக்கான பங்களிப்புகள்
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license noopener">CC BY-SA 4.0</a>
+        உரிமத்தில் ஏற்கப்படுகின்றன. தளக் குறியீடு MIT.
+      </p>
+    </section>
+
+    <p class="page__back"><a href="index.html">← அகராதிக்குத் திரும்பு · Back to the dictionary</a></p>
+  </article>
+</main>
+
+<footer class="footer">
+  <div class="shell footer__inner">
+    <div>
+      <h2>தரவுத்தொகுப்பு · Dataset</h2>
+      <p class="muted"><a href="https://github.com/dharaneishvc/Kongu-tamil-dictionary/blob/main/data/entries.csv">CSV பதிவிறக்கம் · Open CSV on GitHub</a></p>
+    </div>
+    <div>
+      <h2>அகராதி · Dictionary</h2>
+      <p class="muted"><a href="index.html">முகப்புக்குத் திரும்பு · Back to home</a></p>
+    </div>
+    <div>
+      <h2>உருவாக்கம் · Maintainer</h2>
+      <p class="muted">இத்திட்டத்தை உருவாக்கி பராமரிப்பவர் தரணீஷ் வா ச, மென்பொருள் பொறியாளர்.</p>
+      <p class="muted">Created and maintained by Dharaneish V C, Software Engineer.</p>
+      <p class="footer__links">
+        <a href="https://linkedin.com/in/dharaneishvc" rel="me noopener">LinkedIn</a>
+        <a href="https://dharaneishvc.github.io/portfolio/" rel="me noopener">Portfolio</a>
+        <a href="https://github.com/dharaneishvc" rel="me noopener">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h2>உரிமம் · Licence</h2>
+      <p class="muted">தரவுத்தொகுப்பு <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license noopener">CC BY-SA 4.0</a> · site code under MIT.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelector('[data-action="theme"]').addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('kongu.theme', next);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+name: Validate dataset
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - data/entries.csv
+      - .github/workflows/validate-data.yml
+  push:
+    branches: [main]
+    paths:
+      - data/entries.csv
+      - .github/workflows/validate-data.yml
+
+permissions:
+  contents: read
+
+jobs:
+  csv-schema:
+    name: Check entries.csv schema
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate exact 12-column CSV rows
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+
+          path = Path("data/entries.csv")
+          expected = [
+              "id", "headword", "variants", "latin", "latin_variants",
+              "meaning_ta", "meaning_en", "examples", "word_type",
+              "category_id", "notes", "image",
+          ]
+
+          with path.open(encoding="utf-8-sig", newline="") as file:
+              reader = csv.reader(file)
+              try:
+                  header = next(reader)
+              except StopIteration:
+                  raise SystemExit("data/entries.csv is empty")
+
+              if header != expected:
+                  raise SystemExit(
+                      "Invalid header. Expected exactly: " + ",".join(expected)
+                  )
+
+              for row_number, row in enumerate(reader, start=2):
+                  if len(row) != len(expected):
+                      raise SystemExit(
+                          f"Row {row_number} has {len(row)} columns; expected {len(expected)}"
+                      )
+
+          print(f"Validated {row_number - 1 if 'row_number' in locals() else 0} data rows")
+          PY

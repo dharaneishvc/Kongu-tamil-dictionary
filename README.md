@@ -26,36 +26,31 @@ This keeps the taxonomy open and future-proof: the website and filters are drive
 ## Table of contents
 
 1. [What this is](#what-this-is)
-2. [Where the data came from](#where-the-data-came-from)
-3. [Dataset schema](#dataset-schema)
-4. [Using the dataset](#using-the-dataset)
-5. [Running the site locally](#running-the-site-locally)
-6. [Deploying for free](#deploying-for-free)
-7. [How to contribute](#how-to-contribute)
+2. [Dataset schema](#dataset-schema)
+3. [Using the dataset](#using-the-dataset)
+4. [Running the site locally](#running-the-site-locally)
+5. [How to contribute](#how-to-contribute)
    * [Add a new word](#a-add-a-new-word)
    * [Edit an existing word](#b-edit-an-existing-word)
    * [Merge duplicates](#c-merge-duplicates)
    * [Add an image](#d-add-an-image)
    * [Formatting rules](#e-formatting-rules-read-this)
    * [Review checklist](#f-review-checklist)
-8. [How the site works](#how-the-site-works)
-9. [Licence](#licence)
+6. [How the site works](#how-the-site-works)
+7. [Licence](#licence)
 
 ---
 
 ## What this is
 
-The aim is a comprehensive dialect dictionary compiling **over 3,000** native words,
-phrases and expressions unique to the Kongu belt, each with its grammatical
+The aim is a comprehensive dialect dictionary compiling native words, phrases and
+expressions unique to the Kongu belt, each with its grammatical
 classification, context and usage examples. It focuses deeply on the agrarian roots,
 lifestyle, kinship and distinctive tonal expressions of Kongu Tamil, capturing many
 fading words tied to traditional farming, household objects and rural Kongu life.
 The live website counts the current entries directly from the CSV.
 
-Kongu Tamil is the dialect of the Kongu Nadu region (Coimbatore, Erode, Salem,
-Tiruppur, Karur, Namakkal and neighbouring parts of Karnataka and Kerala). Much of
-its vocabulary — words for farm tools, house parts, kinship, festivals, food — is
-disappearing as the dialect levels toward standard spoken Tamil.
+Much of Kongu Tamil's archaic vocabulary — words for farm tools, house parts, kinship, festivals, food — is disappearing as the dialect levels toward standard spoken Tamil.
 
 Existing word lists for the dialect are scattered prose: hard to search, impossible to
 query, full of duplicates. This project consolidates them into **one normalised,
@@ -70,8 +65,7 @@ the word is spelled with ழ, ள or ல.
 | One source of truth | Dictionary rows and category metadata are plain CSV files. The site reads them directly; nothing is generated. |
 | Editable by non-programmers | Any row can be fixed in GitHub's web editor, no tooling. |
 | Zero lock-in | No framework, no CDN, no database, no API key, no build. |
-| Honest about gaps | Words with no recorded gloss are kept and flagged as "needs meaning" rather than silently dropped. |
-| Free to host | Pure static files — GitHub Pages, Netlify, Cloudflare Pages all work. |
+| Simple to run | Pure static files with no build step, database, or API key. |
 
 ---
 
@@ -89,13 +83,11 @@ first. Multi-valued cells use a space-padded pipe: ` | `.
 | 5 | `latin_variants` | no | Other Latin transliteration spellings people might type. |
 | 6 | `meaning_ta` | **yes**\* | Meaning in Tamil. Multiple senses separated by `|`. |
 | 7 | `meaning_en` | no | English gloss. |
-| 8 | `example_1` | no | Usage sentence. |
-| 9 | `example_2` | no | Second usage sentence. |
-| 10 | `more_examples` | no | Any further sentences, `|`-separated. |
-| 11 | `word_type` | no | பெயர்ச்சொல் / வினைச்சொல் / உரிச்சொல் … |
-| 12 | `category_id` | **yes** | Foreign key into `data/categories.csv`; drives bilingual category chips on the site. |
-| 13 | `notes` | no | Etymology, sub-regional usage, caveats. |
-| 14 | `image` | no | Filename inside `images/`, e.g. `ollu.jpg`. Not a path. |
+| 8 | `examples` | no | Usage sentences. Multiple examples are separated by `|`, just like variants and meanings. |
+| 9 | `word_type` | no | பெயர்ச்சொல் / வினைச்சொல் / உரிச்சொல் … |
+| 10 | `category_id` | **yes** | Foreign key into `data/categories.csv`; drives bilingual category chips on the site. |
+| 11 | `notes` | no | Etymology, sub-regional usage, caveats. |
+| 12 | `image` | no | Filename inside `images/`, e.g. `ollu.jpg`. Not a path. |
 
 \* Some entries may have an empty `meaning_ta`: the word is recorded but no gloss
 has been written yet. They are deliberately retained — filter for them on the site with
@@ -103,23 +95,6 @@ has been written yet. They are deliberately retained — filter for them on the 
 
 **Categories.** Every entry points to one category in `data/categories.csv`; the website
 calculates category counts from the CSV at runtime.
-
-| Group |
-| --- |
-| வீடும் வீட்டுப் பொருளும் |
-| உணவும் சமையலும் |
-| விவசாயமும் கால்நடையும் |
-| மனிதப் பண்பும் நடத்தையும் |
-| செயலும் வினையும் |
-| உடலும் நலமும் |
-| பேச்சு வழக்கும் உரிச்சொல்லும் |
-| இயற்கையும் உயிரினமும் |
-| பண்டிகை, சடங்கு, வழிபாடு |
-| இடமும் திசையும் |
-| உறவுமுறைச் சொற்கள் |
-| நேரமும் பருவமும் |
-| அளவும் அளவைகளும் |
-| உடையும் அணிகலனும் |
 
 To count rows locally:
 
@@ -155,14 +130,8 @@ share-alike.
 
 ## Running the site locally
 
-Once it is hosted (GitHub Pages, Netlify, …) nothing extra is needed — it is plain
-static files over HTTP.
-
-Locally, **double-clicking `index.html` may show a blank page**. Most browsers refuse
-to load ES modules and `fetch()` a data file from a `file://` URL, because that origin
-is treated as opaque. Some Chromium builds allow it, so it might work for you; if it
-does not, the page shows a short notice explaining what to do rather than failing
-silently.
+Once the folder is served over HTTP, nothing extra is needed — it is plain static
+files with no build step.
 
 The reliable way is to serve the folder over HTTP:
 
@@ -176,17 +145,6 @@ There is nothing to install, compile or watch.
 
 ---
 
-## Deploying for free
-
-**GitHub Pages** — Settings → Pages → *Deploy from a branch* → `main` / `root`.
-Done; the site is entirely static and every path is relative, so it works from a
-subdirectory such as `username.github.io/kongu-dictionary/`.
-
-**Netlify / Cloudflare Pages / Vercel** — connect the repo, leave the build command
-empty and set the publish directory to `/`.
-
----
-
 ## How to contribute
 
 Most edits live in **`data/entries.csv`**. Category names live in
@@ -194,11 +152,21 @@ Most edits live in **`data/entries.csv`**. Category names live in
 touch any JavaScript. The same guide is available on the site itself at
 [`contribute.html`](contribute.html), written bilingually.
 
+For normal future updates, keep changes data-only:
+
+1. Edit `data/entries.csv`, `data/categories.csv`, or add an image under `images/`.
+2. Open the site locally and search for the edited word.
+3. Do not change files in `assets/` unless the website behaviour itself needs a new feature.
+
 The easiest route needs no local setup at all:
 
 > Open [`data/entries.csv`](data/entries.csv) on GitHub → click the
 > ✏️ pencil → make your edit → **Commit changes** → **Propose changes** → **Create
 > pull request**.
+
+Every pull request that changes `data/entries.csv` is checked by GitHub Actions.
+The check requires the exact 12-column header and rejects any row with a different
+number of fields, including rows affected by unescaped commas.
 
 ### A. Add a new word
 
@@ -206,12 +174,12 @@ Append a row at the end of the file. **Leave `id` empty** — a maintainer assig
 when merging, which keeps existing permalinks stable.
 
 ```csv
-id,headword,variants,latin,latin_variants,meaning_ta,meaning_en,example_1,example_2,more_examples,word_type,category_id,notes,image
-,ஒல்லு,,ollu,,நெல் குத்தும் செக்கு,husking mill,ஒல்லுல நெல்லக் குத்திட்டு வா,,,,farming_livestock,,
+id,headword,variants,latin,latin_variants,meaning_ta,meaning_en,examples,word_type,category_id,notes,image
+,ஒல்லு,,ollu,,நெல் குத்தும் செக்கு,husking mill,ஒல்லுல நெல்லக் குத்திட்டு வா,,farming_livestock,,
 ```
 
 Minimum viable row: `headword` + `meaning_ta`. Everything else is a bonus — but a
-usage sentence in `example_1` is worth more than any other optional field, because it
+usage sentence in `examples` is worth more than any other optional field, because it
 shows the word alive in context.
 
 Before adding, **search the site first**. The search is spelling-tolerant precisely so
@@ -269,7 +237,7 @@ detail panel. No code change is needed.
 Before opening the pull request:
 
 - [ ] The word does not already exist (searched in both scripts).
-- [ ] Column count is unchanged — 14 fields per row.
+- [ ] Column count is unchanged — 12 fields per row.
 - [ ] Cells containing commas are quoted.
 - [ ] `id` is untouched on edits, empty on new rows.
 - [ ] The file still opens correctly (`python -m http.server` and load the site).

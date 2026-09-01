@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ta" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary</title>
+<meta name="description" content="கொங்கு வட்டார வழக்குச் சொற்களின் திறந்த அகராதி. தமிழிலும் இலத்தீன் எழுத்து ஒலிபெயர்ப்பிலும் தேடலாம். An open, community-built dictionary of the Kongu Tamil dialect — words, meanings, usage examples and Latin transliteration search.">
+<meta name="theme-color" content="#7a3d12">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/">
+<meta property="og:title" content="கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary">
+<meta property="og:description" content="An open, community-built dictionary of the Kongu Tamil dialect. Search in Tamil script, Latin transliteration, or English meaning.">
+<meta property="og:site_name" content="Kongu Tamil Dialect Dictionary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary">
+<meta name="twitter:description" content="An open, community-built dictionary of the Kongu Tamil dialect. Search in Tamil script, Latin transliteration, or English meaning.">
+<link rel="canonical" href="https://dharaneishvc.github.io/Kongu-tamil-dictionary/">
+<meta name="keywords" content="Kongu Tamil, Dictionary, Dialect, Tamil, கொங்கு தமிழ், அகராதி, Kongu region">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Kongu Tamil Dialect Dictionary",
+  "description": "An open, community-built dictionary of the Kongu Tamil dialect. Search in Tamil script, Latin transliteration, or English meaning.",
+  "url": "https://dharaneishvc.github.io/Kongu-tamil-dictionary/",
+  "creator": {
+    "@type": "Person",
+    "name": "Dharaneish V C",
+    "url": "https://dharaneishvc.github.io/portfolio/"
+  },
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "keywords": ["Kongu Tamil", "Dictionary", "Dialect", "Tamil", "கொங்கு தமிழ்", "அகராதி"]
+}
+</script>
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E0%AE%95%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/styles.css?v=2">
+</head>
+<body>
+<a class="skip-link" href="#results">உள்ளடக்கத்திற்குச் செல்</a>
+
+<header class="masthead">
+  <div class="shell masthead__inner">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true">க</span>
+      <span class="brand__text">
+        <strong>கொங்கு வட்டார வழக்கு அகராதி</strong>
+        <small>Kongu Tamil Dialect Dictionary</small>
+      </span>
+    </div>
+
+    <div class="masthead__actions">
+      <button type="button" class="btn btn--ghost" data-action="random" title="ஏதேனும் ஒரு சொல் · Random word (R)">
+        <span aria-hidden="true">⤫</span> ஏதேனும் · Random
+      </button>
+      <a class="btn btn--ghost" href="about.html">பற்றி · About</a>
+      <a class="btn btn--ghost" href="contribute.html">பங்களிக்க · Contribute</a>
+      <button type="button" class="btn btn--ghost" data-action="theme" aria-label="நிறத்தை மாற்று · Toggle colour theme">
+        <span aria-hidden="true">◐</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="shell">
+  <h1 class="visually-hidden">கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary</h1>
+  <section class="search" aria-label="தேடல்">
+    <div class="search__field">
+      <div class="search__box">
+        <span class="search__icon" aria-hidden="true">⌕</span>
+        <input
+          id="q"
+          type="search"
+          class="search__input"
+          placeholder="தமிழ், Latin ஒலிபெயர்ப்பு, அல்லது English meaning — எ.கா. பொடக்காலி / podakkaali / backyard"
+          autocomplete="off" autocapitalize="off" spellcheck="false"
+          role="combobox" aria-expanded="false" aria-autocomplete="list"
+          aria-controls="suggestions" aria-describedby="search-hint">
+        <button type="button" class="search__clear" data-action="clear" aria-label="தேடலை அழி" hidden>✕</button>
+      </div>
+      <ul id="suggestions" class="suggest" role="listbox" aria-label="பரிந்துரைகள்" hidden></ul>
+    </div>
+    <p id="search-hint" class="search__hint">
+      தமிழ் எழுத்து, Latin ஒலிபெயர்ப்பு (<code>zh/l</code>, <code>th/t</code>, <code>ka/ga</code> வேறுபாடின்றி), அல்லது English meaning மூலம் தேடலாம்.
+      <kbd>/</kbd> தேடல் · <kbd>F</kbd> வடிகட்டி · <kbd>R</kbd> ஏதேனும் ஒரு சொல்.
+    </p>
+  </section>
+
+  <section class="controls">
+    <button type="button" class="btn btn--filter" data-action="filters"
+            aria-haspopup="dialog" aria-controls="filters">
+      <span aria-hidden="true">⚙</span> வடிகட்டி &amp; வரிசை · Filter &amp; sort
+      <span class="btn__badge" id="filter-count" hidden></span>
+    </button>
+    <div class="active-filters" id="active-filters" aria-label="செயலில் உள்ள வடிகட்டிகள்"></div>
+  </section>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <section id="results" class="results" tabindex="-1" aria-label="முடிவுகள்"></section>
+
+  <div id="sentinel" class="sentinel" aria-hidden="true"></div>
+
+  <p class="results__actions">
+    <button type="button" class="btn btn--primary" data-action="view-all" hidden>
+      அனைத்தையும் காண்க · View all
+    </button>
+  </p>
+
+  <p class="results__more">
+    சொல் காணவில்லையா, அல்லது தவறு இருக்கிறதா? <a href="contribute.html">சேர்க்க / திருத்தும் வழியைப் பாருங்கள் →</a><br>
+    <span class="muted">Word missing, or found a mistake? <a href="contribute.html">See how to add or fix it →</a></span>
+  </p>
+</main>
+
+<footer class="footer">
+  <div class="shell footer__inner">
+    <div>
+      <h2>தரவுத்தொகுப்பு · Dataset</h2>
+      <p id="dataset-meta" class="muted"></p>
+      <p>
+        <a href="data/entries.csv" download>CSV பதிவிறக்கம் · Download</a>
+      </p>
+    </div>
+    <div>
+      <h2>பங்களிப்பு · Contributing</h2>
+      <p class="muted">
+        இது ஒரு திறந்த தரவுத்தொகுப்பு. உங்களூரில் வழங்கும் சொற்களைச்
+        சேர்க்கவும், தவறுகளைத் திருத்தவும் ஒரு வரி CSV திருத்தம் போதும்.
+      </p>
+      <p class="muted">
+        A community-built open dataset — adding or correcting an entry is a one-line CSV edit.
+      </p>
+      <p><a href="contribute.html">எப்படிச் சேர்ப்பது · How to add →</a></p>
+    </div>
+    <div>
+      <h2>உருவாக்கம் · Maintainer</h2>
+      <p class="muted">இத்திட்டத்தை உருவாக்கி பராமரிப்பவர் தரணீஷ் வா ச, மென்பொருள் பொறியாளர்.</p>
+      <p class="muted">Created and maintained by Dharaneish V C, Software Engineer.</p>
+      <p class="footer__links">
+        <a href="https://linkedin.com/in/dharaneishvc" rel="me noopener">LinkedIn</a>
+        <a href="https://dharaneishvc.github.io/portfolio/" rel="me noopener">Portfolio</a>
+        <a href="https://github.com/dharaneishvc" rel="me noopener">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h2>உரிமம் · Licence</h2>
+      <p class="muted">
+        தரவுத்தொகுப்பு
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license noopener">CC BY-SA 4.0</a>
+        உரிமத்தில் சுதந்திரமாகப் பகிரப்படுகிறது. இணையதளக் குறியீடு MIT.
+      </p>
+      <p class="muted">Dataset under CC BY-SA 4.0 · site code under MIT.</p>
+    </div>
+  </div>
+</footer>
+
+<dialog id="detail" class="detail" aria-label="சொல் விவரம்"></dialog>
+
+<dialog id="filters" class="drawer" aria-label="வடிகட்டி மற்றும் வரிசை">
+  <form method="dialog" class="drawer__head">
+    <h2>வடிகட்டி &amp; வரிசை <span class="muted">· Filter &amp; sort</span></h2>
+    <button class="drawer__close" value="close" aria-label="மூடு · Close">✕</button>
+  </form>
+
+  <div class="drawer__body">
+    <section class="drawer__group">
+      <h3>பிரிவு · Category</h3>
+      <div class="chips chips--stack" id="categories" role="group" aria-label="பிரிவுகள்"></div>
+    </section>
+
+    <section class="drawer__group">
+      <h3>கூடுதல் வடிகட்டிகள் · More filters</h3>
+      <div class="toggles">
+        <label class="toggle"><input type="checkbox" data-filter="examples"> எடுத்துக்காட்டு உள்ளவை</label>
+        <label class="toggle"><input type="checkbox" data-filter="english"> ஆங்கிலப் பொருள் உள்ளவை</label>
+        <label class="toggle"><input type="checkbox" data-filter="images"> படம் உள்ளவை</label>
+        <label class="toggle"><input type="checkbox" data-filter="undocumented"> பொருள் தேவை</label>
+      </div>
+    </section>
+
+    <section class="drawer__group">
+      <h3>வரிசை · Sort</h3>
+      <label class="select">
+        <select id="sort">
+          <option value="relevance">பொருத்தம் · Relevance</option>
+          <option value="alpha">அகர வரிசை · A–Z</option>
+          <option value="richest">விவரம் நிறைந்தவை · Richest</option>
+        </select>
+      </label>
+    </section>
+  </div>
+
+  <footer class="drawer__foot">
+    <button type="button" class="btn" data-action="reset">அனைத்தையும் நீக்கு · Reset all</button>
+    <button type="button" class="btn btn--primary" data-action="close-filters">முடிந்தது · Done</button>
+  </footer>
+</dialog>
+
+<template id="tpl-empty">
+  <div class="empty">
+    <p class="empty__title">முடிவுகள் இல்லை</p>
+    <p class="muted">எழுத்துப்பிழை இருக்கலாம் — வேறு வடிவத்தில் முயற்சிக்கவும், அல்லது வடிகட்டிகளை நீக்கவும்.</p>
+    <button type="button" class="btn" data-action="reset">வடிகட்டிகளை நீக்கு</button>
+  </div>
+</template>
+
+<script type="module" src="assets/main.js?v=2"></script>
+<script>
+  // Modules and fetch() are both blocked on file:// — say so instead of showing a blank page.
+  if (location.protocol === 'file:') {
+    document.getElementById('results').innerHTML =
+      '<div class="empty">' +
+      '<p class="empty__title">ஒரு சிறிய சேவையகம் தேவை</p>' +
+      '<p class="muted">உலாவிகள் <code>file://</code> முகவரியில் தரவுக் கோப்பைப் படிக்க அனுமதிப்பதில்லை. ' +
+      'இந்தக் கோப்புறையில் கீழ்க்கண்ட கட்டளையை இயக்கி <code>http://localhost:8000</code> திறக்கவும்:</p>' +
+      '<pre class="guide__code"><code>python -m http.server 8000</code></pre>' +
+      '<p class="muted">இணையத்தில் ஏற்றியபின் (GitHub Pages போன்றவை) இது தானாகவே வேலை செய்யும்.</p>' +
+      '</div>';
+    document.getElementById('status').textContent = '';
+  }
+</script>
+<noscript><p class="shell">இந்த அகராதியைப் பயன்படுத்த JavaScript தேவை. தரவை <a href="data/entries.csv">CSV</a> ஆகவும் பதிவிறக்கலாம்.</p></noscript>
+</body>
+</html>

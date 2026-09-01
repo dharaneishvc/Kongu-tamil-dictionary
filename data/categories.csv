@@ -1,0 +1,15 @@
+id,label_ta,label_en,is_active
+home_household,வீடும் வீட்டுப் பொருளும்,Home and household items,1
+food_cooking,உணவும் சமையலும்,Food and cooking,1
+farming_livestock,விவசாயமும் கால்நடையும்,Farming and livestock,1
+human_behavior,மனிதப் பண்பும் நடத்தையும்,Human character and behaviour,1
+action_verbs,செயலும் வினையும்,Actions and verbs,1
+body_health,உடலும் நலமும்,Body and health,1
+speech_phrase,பேச்சு வழக்கும் உரிச்சொல்லும்,"Speech, idiom and expression",1
+nature_animals,இயற்கையும் உயிரினமும்,Nature and living beings,1
+festival_religion,"பண்டிகை, சடங்கு, வழிபாடு","Festivals, rituals and worship",1
+place_direction,இடமும் திசையும்,Places and directions,1
+kinship,உறவுமுறைச் சொற்கள்,Kinship terms,1
+time_seasons,நேரமும் பருவமும்,Time and seasons,1
+measure_units,அளவும் அளவைகளும்,Measures and units,1
+dress_accessories,உடையும் அணிகலனும்,Dress and accessories,1
