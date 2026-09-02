@@ -163,6 +163,7 @@
             <tr><td><code>word_type</code></td><td>—</td><td>பெயர்ச்சொல் / வினைச்சொல் / உரிச்சொல் · Noun / verb / adjective, and so on.</td></tr>
             <tr><td><code>category_id</code></td><td class="req">✔</td><td>முதன்மை பிரிவு குறியீடு; <code>data/categories.csv</code>-இன் <code>id</code>-யைச் சுட்டும் Foreign key · Category foreign key pointing to an <code>id</code> in <code>data/categories.csv</code>.</td></tr>
             <tr><td><code>notes</code></td><td>—</td><td>சொற்பிறப்பு, வட்டார வேறுபாடு, ஐயங்கள் · Etymology, regional notes or uncertainties.</td></tr>
+            <tr><td><code>source_id</code></td><td>—</td><td><code>data/sources.csv</code>-இன் <code>id</code>-யைச் சுட்டும் Foreign key; இந்தச் சொல்லுக்கான மூல(ங்கள்) · Foreign key into <code>data/sources.csv</code> naming the reference(s) for this entry; separate multiple sources with <code>|</code>.</td></tr>
             <tr><td><code>image</code></td><td>—</td><td><code>images/</code>-இல் உள்ள கோப்புப் பெயர் மட்டும் · The filename in <code>images/</code>, such as <code>ollu.jpg</code>, not a path.</td></tr>
           </tbody>
         </table>

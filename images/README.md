@@ -4,7 +4,7 @@ Pictures for dictionary entries. Referenced from the `image` column of
 `data/entries.csv` **by filename only**:
 
 ```csv
-123,ஒல்லு,,ollu,,நெல் குத்தும் செக்கு,husking mill,ஒல்லுல நெல்லக் குத்திட்டு வா,,,,farming_livestock,,ollu.jpg
+123,ஒல்லு,,ollu,,நெல் குத்தும் செக்கு,husking mill,ஒல்லுல நெல்லக் குத்திட்டு வா,,farming_livestock,,,ollu.jpg
 ```
 
 Guidelines:
