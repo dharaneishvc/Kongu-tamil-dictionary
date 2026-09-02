@@ -95,6 +95,7 @@ export function entryDetail(entry) {
       ${section('வழக்கு / எடுத்துக்காட்டு / Example', entry.examples.length ? ul(entry.examples) : '')}
       ${section('வேறு வடிவங்கள் / Other forms', entry.variants.length ? ul(entry.variants) : '')}
       ${section('குறிப்புகள் / Notes', entry.notes.length ? ul(entry.notes) : '')}
+      ${section('மூலம் / Source', entry.sourceLabels.length ? ul(entry.sourceLabels) : '')}
 
       <footer class="detail__foot">
         <button type="button" class="btn" data-action="copy-link" data-id="${esc(entry.id)}">🔗 இணைப்பை நகலெடு · Copy </button>

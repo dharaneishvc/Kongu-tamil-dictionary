@@ -5,11 +5,13 @@ on:
     branches: [main]
     paths:
       - data/entries.csv
+      - data/sources.csv
       - .github/workflows/validate-data.yml
   push:
     branches: [main]
     paths:
       - data/entries.csv
+      - data/sources.csv
       - .github/workflows/validate-data.yml
 
 permissions:
@@ -23,7 +25,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Validate exact 12-column CSV rows
+      - name: Validate exact 13-column CSV rows
         shell: bash
         run: |
           python - <<'PY'
@@ -34,7 +36,7 @@ jobs:
           expected = [
               "id", "headword", "variants", "latin", "latin_variants",
               "meaning_ta", "meaning_en", "examples", "word_type",
-              "category_id", "notes", "image",
+              "category_id", "notes", "source_id", "image",
           ]
 
           with path.open(encoding="utf-8-sig", newline="") as file:

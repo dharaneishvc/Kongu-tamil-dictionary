@@ -4,21 +4,22 @@ An open, community-editable dictionary of **Kongu Tamil** (கொங்குத
 and archaic words — published as a plain CSV dataset with a fast, dependency-free
 website on top of it.
 
-## Core design pattern: one data CSV + one category master CSV
+## Core design pattern: one data CSV + master CSVs
 
 The project is built around a simple, extensible schema:
 
 - `data/entries.csv` stores the dictionary entries.
 - `data/categories.csv` stores the category master list.
-- Each row in the dictionary uses a foreign key such as `category_id` instead of a hardcoded Tamil label.
-- The site resolves the category name and English label at runtime from the master CSV.
+- `data/sources.csv` stores the reference/source master list.
+- Each row in the dictionary uses a foreign key such as `category_id` and `source_id` instead of hardcoded Tamil labels.
+- The site resolves category names and source labels at runtime from the master CSVs.
 - The first view always starts on **All**. If a new group is added to `categories.csv` with `is_active=1`, it appears in the filter UI automatically.
 
 This keeps the taxonomy open and future-proof: the website and filters are driven by data, not by hardcoded JS constants.
 
 * **Dataset** — [`data/entries.csv`](data/entries.csv) · CC BY-SA 4.0
 * **Website** — static HTML/CSS/ES-modules, no framework, no build step, no tracking
-* **Search** — works in Tamil script *and* Latin transliteration / phonetic romanization, spelling-tolerant, with live autocomplete
+* **Search** — works in Tamil script, Latin transliteration / phonetic romanization, and English glosses; spelling-tolerant, with live autocomplete
 * **Contributing** — [`contribute.html`](contribute.html) explains the whole workflow on the site itself
 
 ---
@@ -50,9 +51,7 @@ lifestyle, kinship and distinctive tonal expressions of Kongu Tamil, capturing m
 fading words tied to traditional farming, household objects and rural Kongu life.
 The live website counts the current entries directly from the CSV.
 
-Much of Kongu Tamil's archaic vocabulary — words for farm tools, house parts, kinship, festivals, food — is disappearing as the dialect levels toward standard spoken Tamil.
-
-Existing word lists for the dialect are scattered prose: hard to search, impossible to
+Much of Kongu Tamil's archaic vocabulary — words for farm tools, house parts, kinship, festivals, food — is disappearing as the dialect levels toward standard spoken Tamil. Existing word lists for the dialect are scattered prose: hard to search, impossible to
 query, full of duplicates. This project consolidates them into **one normalised,
 machine-readable dataset** and gives it a search interface that works the way people
 actually type — including Latin-letter phonetic input, and without demanding that you know whether
@@ -62,7 +61,7 @@ the word is spelled with ழ, ள or ல.
 
 | Goal | How |
 | --- | --- |
-| One source of truth | Dictionary rows and category metadata are plain CSV files. The site reads them directly; nothing is generated. |
+| One source of truth | Dictionary rows, category metadata, and source metadata are plain CSV files. The site reads them directly; nothing is generated. |
 | Editable by non-programmers | Any row can be fixed in GitHub's web editor, no tooling. |
 | Zero lock-in | No framework, no CDN, no database, no API key, no build. |
 | Simple to run | Pure static files with no build step, database, or API key. |
@@ -87,7 +86,8 @@ first. Multi-valued cells use a space-padded pipe: ` | `.
 | 9 | `word_type` | no | பெயர்ச்சொல் / வினைச்சொல் / உரிச்சொல் … |
 | 10 | `category_id` | **yes** | Foreign key into `data/categories.csv`; drives bilingual category chips on the site. |
 | 11 | `notes` | no | Etymology, sub-regional usage, caveats. |
-| 12 | `image` | no | Filename inside `images/`, e.g. `ollu.jpg`. Not a path. |
+| 12 | `source_id` | no | Foreign key(s) into `data/sources.csv`; which reference(s) this entry was drawn from. Multiple sources separated by `|`. |
+| 13 | `image` | no | Filename inside `images/`, e.g. `ollu.jpg`. Not a path. |
 
 \* Some entries may have an empty `meaning_ta`: the word is recorded but no gloss
 has been written yet. They are deliberately retained — filter for them on the site with
@@ -95,6 +95,9 @@ has been written yet. They are deliberately retained — filter for them on the 
 
 **Categories.** Every entry points to one category in `data/categories.csv`; the website
 calculates category counts from the CSV at runtime.
+
+**Sources.** `data/sources.csv` uses the same `id,label,is_active` pattern as categories.
+To credit a new reference, add a row there first, then reference its `id` from `source_id`.
 
 To count rows locally:
 
@@ -147,14 +150,14 @@ There is nothing to install, compile or watch.
 
 ## How to contribute
 
-Most edits live in **`data/entries.csv`**. Category names live in
-**`data/categories.csv`**. Edit the CSVs and the site changes; you do not need to
+Most edits live in **`data/entries.csv`**. Category names and source labels live in
+**`data/categories.csv`** and **`data/sources.csv`**. Edit the CSVs and the site changes; you do not need to
 touch any JavaScript. The same guide is available on the site itself at
 [`contribute.html`](contribute.html), written bilingually.
 
 For normal future updates, keep changes data-only:
 
-1. Edit `data/entries.csv`, `data/categories.csv`, or add an image under `images/`.
+1. Edit `data/entries.csv`, `data/categories.csv`, `data/sources.csv`, or add an image under `images/`.
 2. Open the site locally and search for the edited word.
 3. Do not change files in `assets/` unless the website behaviour itself needs a new feature.
 
@@ -165,7 +168,7 @@ The easiest route needs no local setup at all:
 > pull request**.
 
 Every pull request that changes `data/entries.csv` is checked by GitHub Actions.
-The check requires the exact 12-column header and rejects any row with a different
+The check requires the exact 13-column header and rejects any row with a different
 number of fields, including rows affected by unescaped commas.
 
 ### A. Add a new word
@@ -174,8 +177,8 @@ Append a row at the end of the file. **Leave `id` empty** — a maintainer assig
 when merging, which keeps existing permalinks stable.
 
 ```csv
-id,headword,variants,latin,latin_variants,meaning_ta,meaning_en,examples,word_type,category_id,notes,image
-,ஒல்லு,,ollu,,நெல் குத்தும் செக்கு,husking mill,ஒல்லுல நெல்லக் குத்திட்டு வா,,farming_livestock,,
+id,headword,variants,latin,latin_variants,meaning_ta,meaning_en,examples,word_type,category_id,notes,source_id,image
+,ஒல்லு,,ollu,,நெல் குத்தும் செக்கு,husking mill,ஒல்லுல நெல்லக் குத்திட்டு வா,,farming_livestock,,,
 ```
 
 Minimum viable row: `headword` + `meaning_ta`. Everything else is a bonus — but a
@@ -196,8 +199,8 @@ same entry.
 Adding a second sense to an existing word means extending the cell, not adding a row:
 
 ```diff
--123,கோடு,,kootu,,கடைசி,,,,,பெயர்ச்சொல்,home_household,,
-+123,கோடு,,kootu,,கடைசி | பக்கம் உயர்ந்த அடுப்பு,,அந்தக் கோட்டிலே உட்கார்,,,,பெயர்ச்சொல்,home_household,"புறநானூறு 164 இல் ""கோடுயர் அடுப்பு""",
+-123,கோடு,,kootu,,கடைசி,,,,,பெயர்ச்சொல்,home_household,,,
++123,கோடு,,kootu,,கடைசி | பக்கம் உயர்ந்த அடுப்பு,,அந்தக் கோட்டிலே உட்கார்,,,,பெயர்ச்சொல்,home_household,"புறநானூறு 164 இல் ""கோடுயர் அடுப்பு""",,
 ```
 
 ### C. Merge duplicates
@@ -237,7 +240,7 @@ detail panel. No code change is needed.
 Before opening the pull request:
 
 - [ ] The word does not already exist (searched in both scripts).
-- [ ] Column count is unchanged — 12 fields per row.
+- [ ] Column count is unchanged — 13 fields per row.
 - [ ] Cells containing commas are quoted.
 - [ ] `id` is untouched on edits, empty on new rows.
 - [ ] The file still opens correctly (`python -m http.server` and load the site).
@@ -265,6 +268,7 @@ assets/
   styles.css          design tokens + components, light & dark
 data/entries.csv
 data/categories.csv
+data/sources.csv
 images/
 ```
 
@@ -275,8 +279,9 @@ paint, not twenty.
 
 **Search.** Both the query and the entry are reduced to a *fold key* that erases the
 distinctions people mix up: ழ/ள/ல, ண/ந/ன, ற/ர, long vs short vowels, pulli, and on
-the Latin side `th`/`t`, `zh`/`l`, `ka`/`ga`, `sh`/`s`, doubled letters. Matches are
-scored — exact beats prefix beats word-start beats substring, headword beats meaning —
+the Latin side `th`/`t`, `zh`/`l`, `ka`/`ga`, `sh`/`s`, `ch`/`c`, `ee`/`i`, `oo`/`u`,
+and doubled letters. Exact headword or variant matches are ranked first, followed by
+prefix, word-start, substring, and meaning matches;
 with a subsequence pass as a last resort so a badly mistyped query still returns
 something. For the current dataset size this is a linear scan taking well under a millisecond, so
 there is no index to build or invalidate.

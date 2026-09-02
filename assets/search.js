@@ -13,6 +13,9 @@ export const hasTamil = (s) => TAMIL_RE.test(s || '');
 export const hasLatin = (s) => LATIN_RE.test(s || '');
 
 const LATIN_DIGRAPHS = [
+  // casual double-vowel spellings for long vowels (ī/ū strip to plain i/u
+  // after diacritics are removed, so "ee"/"oo" must fold the same way)
+  ['ee', 'i'], ['oo', 'u'],
   ['zh', 'l'], ['th', 't'], ['dh', 't'], ['sh', 's'], ['ch', 's'],
   ['ph', 'p'], ['gh', 'k'], ['kh', 'k'], ['bh', 'p'], ['jh', 's'],
   ['ng', 'n'], ['nj', 'n'], ['nd', 'nt'], ['mb', 'mp'],
@@ -20,7 +23,10 @@ const LATIN_DIGRAPHS = [
 
 const LATIN_SINGLES = {
   d: 't', g: 'k', b: 'p', j: 's', w: 'v', z: 's',
-  c: 'k', q: 'k', x: 'ks', f: 'p', y: 'i',
+  // 'c' always transliterates ச (ch/s sound) in this dataset — fold it like
+  // the 'ch' digraph, not like English hard-c, or "chee"/"see" queries never
+  // match headwords spelled with plain 'c' (e.g. cīrāṭṭutal).
+  c: 's', q: 'k', x: 'ks', f: 'p', y: 'i',
 };
 
 const TAMIL_FOLD = {
@@ -95,6 +101,15 @@ const FIELD_WEIGHTS = [
  */
 export function scoreEntry(entry, keys) {
   let best = 0;
+
+  // an exact match on the headword OR any single variant/spelling always wins
+  // over a mere prefix/substring hit, regardless of field weight order below
+  if (keys.tamil && entry.kt && (entry.ktHead === keys.tamil || entry.kt.split(' ').includes(keys.tamil))) {
+    best = Math.max(best, 140);
+  }
+  if (keys.latin && entry.kl && (entry.klHead === keys.latin || entry.kl.split(' ').includes(keys.latin))) {
+    best = Math.max(best, 140);
+  }
 
   for (const [field, kind, weight] of FIELD_WEIGHTS) {
     const key = keys[kind];

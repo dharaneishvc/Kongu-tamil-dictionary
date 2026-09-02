@@ -30,14 +30,16 @@ export function createStore(initialState) {
 
 export const DATASET_URL = 'data/entries.csv';
 export const CATEGORY_GROUPS_URL = 'data/categories.csv';
+export const SOURCES_URL = 'data/sources.csv';
 export const INITIAL_LIMIT = 24;
 export const PAGE_SIZE = 60;
 
 const ENTRY_HEADER = [
   'id', 'headword', 'variants', 'latin', 'latin_variants', 'meaning_ta',
-  'meaning_en', 'examples', 'word_type', 'category_id', 'notes', 'image',
+  'meaning_en', 'examples', 'word_type', 'category_id', 'notes', 'source_id', 'image',
 ];
 const CATEGORY_HEADER = ['id', 'label_ta', 'label_en', 'is_active'];
+const SOURCE_HEADER = ['id', 'label', 'is_active'];
 
 export const initialState = {
   status: 'loading',
@@ -63,15 +65,17 @@ const split = (value) =>
     .map((part) => part.trim())
     .filter(Boolean);
 
-/** Load the committed CSV files — data and category master. */
+/** Load the committed CSV files — data, category master and source master. */
 export async function loadDataset(url = DATASET_URL) {
-  const [datasetResponse, groupsResponse] = await Promise.all([
+  const [datasetResponse, groupsResponse, sourcesResponse] = await Promise.all([
     fetch(url, { cache: 'no-cache' }),
     fetch(CATEGORY_GROUPS_URL, { cache: 'no-cache' }),
+    fetch(SOURCES_URL, { cache: 'no-cache' }),
   ]);
 
   if (!datasetResponse.ok) throw new Error(`Dataset request failed (${datasetResponse.status})`);
   if (!groupsResponse.ok) throw new Error(`Category groups request failed (${groupsResponse.status})`);
+  if (!sourcesResponse.ok) throw new Error(`Source list request failed (${sourcesResponse.status})`);
 
   const groups = parseCsvRecords(await groupsResponse.text(), CATEGORY_HEADER)
     .filter((record) => (record.id || '').trim())
@@ -83,9 +87,19 @@ export async function loadDataset(url = DATASET_URL) {
   }
   const groupById = new Map(groups.map((group) => [group.id, group]));
 
+  const sources = parseCsvRecords(await sourcesResponse.text(), SOURCE_HEADER)
+    .filter((record) => (record.id || '').trim())
+    .map(normaliseSource);
+  const sourceIds = new Set();
+  for (const source of sources) {
+    if (sourceIds.has(source.id)) throw new Error(`Duplicate source id: ${source.id}`);
+    sourceIds.add(source.id);
+  }
+  const sourceById = new Map(sources.map((source) => [source.id, source]));
+
   const entries = parseCsvRecords(await datasetResponse.text(), ENTRY_HEADER)
     .filter((record) => (record.headword || '').trim())
-    .map((record) => toEntry(record, groupById));
+    .map((record) => toEntry(record, groupById, sourceById));
 
   const entryIds = new Set();
   for (const entry of entries) {
@@ -95,11 +109,14 @@ export async function loadDataset(url = DATASET_URL) {
     for (const categoryId of entry.categories) {
       if (!groupById.has(categoryId)) throw new Error(`Unknown category id: ${categoryId}`);
     }
+    for (const sourceId of entry.sourceIds) {
+      if (!sourceById.has(sourceId)) throw new Error(`Unknown source id: ${sourceId}`);
+    }
   }
 
   const categories = collectCategories(entries, groupById);
 
-  return { meta: buildMeta(entries), entries, categories, categoryGroups: groups };
+  return { meta: buildMeta(entries), entries, categories, categoryGroups: groups, sources };
 }
 
 function normaliseGroup(record) {
@@ -111,12 +128,21 @@ function normaliseGroup(record) {
   };
 }
 
-function toEntry(record, groupById) {
+function normaliseSource(record) {
+  return {
+    id: (record.id || '').trim(),
+    label: (record.label || '').trim(),
+    is_active: String(record.is_active || '1').trim() !== '0',
+  };
+}
+
+function toEntry(record, groupById, sourceById) {
   const variants = split(record.variants);
   const latinVariants = split(record.latin_variants);
   const meanings = split(record.meaning_ta);
   const english = split(record.meaning_en);
   const categoryIds = split(record.category_id || record.category);
+  const sourceIds = split(record.source_id);
 
   const examples = split(record.examples);
 
@@ -138,12 +164,19 @@ function toEntry(record, groupById) {
         return group.label_ta && group.label_en ? `${group.label_ta} · ${group.label_en}` : group.label_ta || group.label_en || id;
       }),
     notes: split(record.notes),
+    sourceIds,
+    sourceLabels: sourceIds.map((id) => sourceById.get(id)?.label || id),
     image: (record.image || '').trim(),
-    // fuzzy keys, built once at load so searching stays a plain string compare
-    kt: foldTamil([record.headword, ...variants].join(' ')),
-    kl: foldLatin([record.latin, ...latinVariants].join(' ')),
+    // fuzzy keys, built once at load so searching stays a plain string compare.
+    // Each term is folded before joining — folding the join instead would strip the
+    // separating space and let characters from adjacent variants bleed together.
+    kt: [record.headword, ...variants].map(foldTamil).filter(Boolean).join(' '),
+    kl: [record.latin, ...latinVariants].map(foldLatin).filter(Boolean).join(' '),
     km: foldTamil(meanings.join(' ')),
     ke: foldLatin(english.join(' ')),
+    // headword-only keys, so an exact match always outranks a variant/partial hit
+    ktHead: foldTamil(record.headword),
+    klHead: foldLatin(record.latin),
   };
 }
 
