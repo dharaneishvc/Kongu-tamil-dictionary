@@ -1,9 +1,9 @@
 /**
- * Minimal observable store: one state object, shallow patches, subscribers.
- * Keeps the rendering layer dumb and the data flow one-directional.
+ * App state and data: a minimal observable store, plus loading and indexing
+ * the CSV dataset (with an IndexedDB copy for offline use).
  */
-import { parseCsvRecords } from './csv.js';
-import { foldLatin, foldTamil } from './search.js';
+import { parseCsvRecords } from './csv.js?v=1';
+import { foldLatin, foldLatinTerm, foldTamil, foldTamilTerm } from './search.js?v=1';
 
 export function createStore(initialState) {
   let state = { ...initialState };
@@ -28,11 +28,21 @@ export function createStore(initialState) {
   };
 }
 
-export const DATASET_URL = 'data/entries.csv';
-export const CATEGORY_GROUPS_URL = 'data/categories.csv';
-export const SOURCES_URL = 'data/sources.csv';
+const DATASET_URL = 'data/entries.csv';
+const CATEGORY_GROUPS_URL = 'data/categories.csv';
+const SOURCES_URL = 'data/sources.csv';
 export const INITIAL_LIMIT = 24;
 export const PAGE_SIZE = 60;
+
+export const STORAGE_KEYS = { favorites: 'kongu.favorites', recent: 'kongu.recent' };
+
+const readList = (key) => {
+  try { return JSON.parse(localStorage.getItem(key) || '[]').filter(Boolean); } catch { return []; }
+};
+
+export function saveList(key, values) {
+  try { localStorage.setItem(key, JSON.stringify(values)); } catch { /* storage blocked: keep in memory only */ }
+}
 
 const ENTRY_HEADER = [
   'id', 'headword', 'variants', 'latin', 'latin_variants', 'meaning_ta',
@@ -55,9 +65,50 @@ export const initialState = {
   selectedId: null,
   suggestOpen: false,
   suggestIndex: -1,
+  collection: '',
+  favorites: readList(STORAGE_KEYS.favorites),
+  recent: readList(STORAGE_KEYS.recent),
 };
 
 const MULTI_VALUE_SEP = '|';
+
+const DATA_CACHE_DB = 'kongu-dictionary-cache';
+const DATA_CACHE_STORE = 'datasets';
+const DATA_CACHE_KEY = 'current';
+
+function openDataCache() {
+  return new Promise((resolve, reject) => {
+    if (!('indexedDB' in window)) return reject(new Error('IndexedDB unavailable'));
+    const request = indexedDB.open(DATA_CACHE_DB, 2);
+    request.onupgradeneeded = () => request.result.createObjectStore(DATA_CACHE_STORE);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function readCachedDataset() {
+  let db;
+  try {
+    db = await openDataCache();
+    return await new Promise((resolve, reject) => {
+      const request = db.transaction(DATA_CACHE_STORE, 'readonly').objectStore(DATA_CACHE_STORE).get(DATA_CACHE_KEY);
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => reject(request.error);
+    });
+  } catch { return null; } finally { db?.close(); }
+}
+
+async function writeCachedDataset(dataset) {
+  let db;
+  try {
+    db = await openDataCache();
+    await new Promise((resolve, reject) => {
+      const request = db.transaction(DATA_CACHE_STORE, 'readwrite').objectStore(DATA_CACHE_STORE).put(dataset, DATA_CACHE_KEY);
+      request.onsuccess = resolve;
+      request.onerror = () => reject(request.error);
+    });
+  } catch { /* storage restrictions must not block the dataset */ } finally { db?.close(); }
+}
 
 const split = (value) =>
   (value || '')
@@ -66,9 +117,21 @@ const split = (value) =>
     .filter(Boolean);
 
 /** Load the committed CSV files — data, category master and source master. */
-export async function loadDataset(url = DATASET_URL) {
+export async function loadDataset() {
+  try {
+    const dataset = await fetchDataset();
+    void writeCachedDataset(dataset);
+    return dataset;
+  } catch (error) {
+    const cached = await readCachedDataset();
+    if (cached) return cached;
+    throw error;
+  }
+}
+
+async function fetchDataset() {
   const [datasetResponse, groupsResponse, sourcesResponse] = await Promise.all([
-    fetch(url, { cache: 'no-cache' }),
+    fetch(DATASET_URL, { cache: 'no-cache' }),
     fetch(CATEGORY_GROUPS_URL, { cache: 'no-cache' }),
     fetch(SOURCES_URL, { cache: 'no-cache' }),
   ]);
@@ -77,25 +140,14 @@ export async function loadDataset(url = DATASET_URL) {
   if (!groupsResponse.ok) throw new Error(`Category groups request failed (${groupsResponse.status})`);
   if (!sourcesResponse.ok) throw new Error(`Source list request failed (${sourcesResponse.status})`);
 
-  const groups = parseCsvRecords(await groupsResponse.text(), CATEGORY_HEADER)
-    .filter((record) => (record.id || '').trim())
-    .map(normaliseGroup);
-  const groupIds = new Set();
-  for (const group of groups) {
-    if (groupIds.has(group.id)) throw new Error(`Duplicate category id: ${group.id}`);
-    groupIds.add(group.id);
-  }
-  const groupById = new Map(groups.map((group) => [group.id, group]));
-
-  const sources = parseCsvRecords(await sourcesResponse.text(), SOURCE_HEADER)
-    .filter((record) => (record.id || '').trim())
-    .map(normaliseSource);
-  const sourceIds = new Set();
-  for (const source of sources) {
-    if (sourceIds.has(source.id)) throw new Error(`Duplicate source id: ${source.id}`);
-    sourceIds.add(source.id);
-  }
-  const sourceById = new Map(sources.map((source) => [source.id, source]));
+  const groupById = indexById(
+    parseCsvRecords(await groupsResponse.text(), CATEGORY_HEADER).map(normaliseGroup),
+    'category',
+  );
+  const sourceById = indexById(
+    parseCsvRecords(await sourcesResponse.text(), SOURCE_HEADER).map(normaliseSource),
+    'source',
+  );
 
   const entries = parseCsvRecords(await datasetResponse.text(), ENTRY_HEADER)
     .filter((record) => (record.headword || '').trim())
@@ -114,9 +166,18 @@ export async function loadDataset(url = DATASET_URL) {
     }
   }
 
-  const categories = collectCategories(entries, groupById);
+  return { meta: buildMeta(entries), entries, categories: collectCategories(entries, groupById) };
+}
 
-  return { meta: buildMeta(entries), entries, categories, categoryGroups: groups, sources };
+/** Map master-table rows by id, skipping blank ids and rejecting duplicates. */
+function indexById(records, kind) {
+  const byId = new Map();
+  for (const record of records) {
+    if (!record.id) continue;
+    if (byId.has(record.id)) throw new Error(`Duplicate ${kind} id: ${record.id}`);
+    byId.set(record.id, record);
+  }
+  return byId;
 }
 
 function normaliseGroup(record) {
@@ -141,10 +202,10 @@ function toEntry(record, groupById, sourceById) {
   const latinVariants = split(record.latin_variants);
   const meanings = split(record.meaning_ta);
   const english = split(record.meaning_en);
-  const categoryIds = split(record.category_id || record.category);
+  const categoryIds = split(record.category_id);
   const sourceIds = split(record.source_id);
-
   const examples = split(record.examples);
+  const notes = split(record.notes);
 
   return {
     id: (record.id || '').trim(),
@@ -163,20 +224,21 @@ function toEntry(record, groupById, sourceById) {
         if (!group) return id;
         return group.label_ta && group.label_en ? `${group.label_ta} · ${group.label_en}` : group.label_ta || group.label_en || id;
       }),
-    notes: split(record.notes),
+    notes,
     sourceIds,
     sourceLabels: sourceIds.map((id) => sourceById.get(id)?.label || id),
     image: (record.image || '').trim(),
-    // fuzzy keys, built once at load so searching stays a plain string compare.
-    // Each term is folded before joining — folding the join instead would strip the
-    // separating space and let characters from adjacent variants bleed together.
-    kt: [record.headword, ...variants].map(foldTamil).filter(Boolean).join(' '),
-    kl: [record.latin, ...latinVariants].map(foldLatin).filter(Boolean).join(' '),
-    km: foldTamil(meanings.join(' ')),
-    ke: foldLatin(english.join(' ')),
+    // Search keys, folded once at load. Headword/variant keys drop spaces (one term
+    // each, space-joined); prose keys keep word boundaries.
+    kt: [record.headword, ...variants].map(foldTamilTerm).filter(Boolean).join(' '),
+    kl: [record.latin, ...latinVariants].map(foldLatinTerm).filter(Boolean).join(' '),
+    km: meanings.map(foldTamil).filter(Boolean).join(' '),
+    ke: english.map(foldLatin).filter(Boolean).join(' '),
+    kx: examples.map(foldTamil).filter(Boolean).join(' '),
+    kn: notes.map(foldTamil).filter(Boolean).join(' '),
     // headword-only keys, so an exact match always outranks a variant/partial hit
-    ktHead: foldTamil(record.headword),
-    klHead: foldLatin(record.latin),
+    ktHead: foldTamilTerm(record.headword),
+    klHead: foldLatinTerm(record.latin),
   };
 }
 
@@ -193,9 +255,7 @@ function collectCategories(entries, groupById) {
   const counts = new Map();
   for (const entry of entries) {
     for (const categoryId of entry.categories) {
-      const group = groupById.get(categoryId) || { id: categoryId, label_ta: categoryId, label_en: categoryId };
       counts.set(categoryId, (counts.get(categoryId) || 0) + 1);
-      group.count = counts.get(categoryId);
     }
   }
 

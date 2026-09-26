@@ -6,31 +6,37 @@
 <title>பங்களிக்க · Contribute — கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary</title>
 <meta name="description" content="கொங்கு வட்டார வழக்கு அகராதியில் புதிய சொற்களைச் சேர்ப்பது, திருத்துவது, படம் இணைப்பது எப்படி. How to add, edit and improve entries in the Kongu Tamil dictionary dataset.">
 <meta name="theme-color" content="#7a3d12">
-<link rel="canonical" href="https://dharaneishvc.github.io/Kongu-tamil-dictionary/contribute.html">
+<link rel="canonical" href="contribute.html">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/contribute.html">
 <meta property="og:title" content="பங்களிக்க — கொங்கு வட்டார வழக்கு அகராதி · Contribute — Kongu Tamil Dialect Dictionary">
 <meta property="og:description" content="கொங்கு வட்டார வழக்கு அகராதியில் புதிய சொற்களைச் சேர்ப்பது, திருத்துவது, படம் இணைப்பது எப்படி. How to add, edit and improve entries.">
+<meta property="og:image" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/assets/og-preview.png?v=1">
+<meta property="og:image:secure_url" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/assets/og-preview.png?v=1">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kongu Tamil Dialect Dictionary">
+<meta property="og:locale" content="ta_IN">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:site_name" content="Kongu Tamil Dialect Dictionary">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="பங்களிக்க — கொங்கு வட்டார வழக்கு அகராதி · Contribute — Kongu Tamil Dialect Dictionary">
 <meta name="twitter:description" content="கொங்கு வட்டார வழக்கு அகராதியில் புதிய சொற்களைச் சேர்ப்பது, திருத்துவது, படம் இணைப்பது எப்படி. How to add, edit and improve entries.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E0%AE%95%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/styles.css?v=2">
-<script>
-  // applied before paint so the page never flashes the wrong theme
-  document.documentElement.dataset.theme =
-    localStorage.getItem('kongu.theme') ||
-    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-</script>
+<meta name="twitter:image" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/assets/og-preview.png?v=1">
+<meta name="twitter:image:alt" content="Kongu Tamil Dialect Dictionary">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="icon" href="assets/icon.svg">
+<link rel="stylesheet" href="assets/styles.css?v=1">
+<script src="assets/theme.js?v=1"></script>
 </head>
 <body>
-<a class="skip-link" href="#guide">உள்ளடக்கத்திற்குச் செல்</a>
+<a class="skip-link" href="#guide">உள்ளடக்கத்திற்குச் செல் · Skip to content</a>
 
 <header class="masthead">
   <div class="shell masthead__inner">
     <a class="brand" href="index.html">
-      <span class="brand__mark" aria-hidden="true">க</span>
+      <img class="brand__icon" src="assets/icon.svg" alt="">
       <span class="brand__text">
         <strong>கொங்கு வட்டார வழக்கு அகராதி</strong>
         <small>Kongu Tamil Dialect Dictionary</small>
@@ -70,7 +76,7 @@
     </p>
   </header>
 
-  <nav class="toc" aria-label="இந்தப் பக்கத்தில்">
+  <nav class="toc" aria-label="இந்தப் பக்கத்தில் · On this page">
     <a href="#quick">விரைவு வழி · Quick route</a>
     <a href="#add">புதிய சொல் · New word</a>
     <a href="#edit">திருத்துதல் · Edit</a>
@@ -271,12 +277,6 @@
   </div>
 </footer>
 
-<script>
-  document.querySelector('[data-action="theme"]').addEventListener('click', () => {
-    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    localStorage.setItem('kongu.theme', next);
-  });
-</script>
+<script src="assets/register-sw.js?v=1"></script>
 </body>
 </html>

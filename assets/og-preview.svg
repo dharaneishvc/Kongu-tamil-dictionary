@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e8b76d"/><stop offset="1" stop-color="#f7e7c2"/></linearGradient>
+<linearGradient id="field" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#789548"/><stop offset="1" stop-color="#294b32"/></linearGradient>
+</defs>
+<rect width="1200" height="630" fill="url(#sky)"/>
+<circle cx="1030" cy="100" r="48" fill="#fff0b5" opacity=".9"/>
+<path d="M0 315Q220 270 430 315T830 305T1200 310V390H0Z" fill="#849663"/>
+<path d="M0 365Q220 320 450 375T850 355T1200 345V630H0Z" fill="url(#field)"/>
+<g fill="none" stroke="#b8c96f" stroke-width="5" opacity=".8"><path d="M0 480Q290 420 590 490T1200 465"/><path d="M0 545Q290 485 590 555T1200 530"/><path d="M0 605Q290 545 590 615T1200 590"/></g>
+<!-- small rural windmill -->
+<g stroke="#6a4b31" stroke-linecap="round" fill="none"><path d="M1000 370L1014 205L1028 370" stroke-width="8"/><circle cx="1014" cy="200" r="10" fill="#6a4b31"/><path d="M1014 200L948 164M1014 200L1075 150M1014 200L1080 244M1014 200L960 258" stroke-width="7"/></g>
+<!-- distant palms -->
+<g fill="#254b32"><path d="M1120 385C1125 285 1130 205 1138 130C1148 220 1152 300 1150 385Z"/><path d="M1138 180Q1075 135 1028 150Q1080 180 1135 205Z"/><path d="M1140 185Q1180 125 1200 130Q1170 175 1145 215Z"/></g>
+<!-- small cattle silhouette -->
+<g fill="#47392b"><path d="M900 520c8-43 42-65 91-61l57 5c25 2 42 17 46 39l-10 19h-32l-10 63h-13l-5-58h-68l-8 58h-13l-2-60h-31z"/><path d="M1048 465l27-30 22 5-13 25zM902 464l-25-18-13 8 25 26z"/><path d="M1090 485l35-12 10 8-38 18z"/></g>
+<!-- safe title panel -->
+<rect x="58" y="58" width="700" height="390" rx="28" fill="#fffaf0" opacity=".97"/>
+<g transform="translate(95 128) scale(.30)"><rect width="512" height="512" rx="112" fill="#a4530f"/><path d="M82 150c55-24 112-15 174 22v230c-62-37-119-46-174-22V150Z" fill="#fff9ed" stroke="#fff9ed" stroke-width="14" stroke-linejoin="round"/><path d="M430 150c-55-24-112-15-174 22v230c62-37 119-46 174-22V150Z" fill="#f2d6a3" stroke="#fff9ed" stroke-width="14" stroke-linejoin="round"/><path d="M256 172v230" stroke="#a4530f" stroke-width="12"/><path d="M112 205c42-13 83-5 121 15M112 250c42-13 83-5 121 15M400 205c-42-13-83-5-121 15M400 250c-42-13-83-5-121 15" fill="none" stroke="#c77b32" stroke-width="9" stroke-linecap="round"/></g>
+<text x="300" y="170" font-family="Georgia,serif" font-size="43" font-weight="700" fill="#241a12">Kongu Tamil</text>
+<text x="300" y="225" font-family="Georgia,serif" font-size="43" font-weight="700" fill="#241a12">Dialect Dictionary</text>
+<text x="300" y="282" font-family="Noto Sans Tamil,Nirmala UI,sans-serif" font-size="24" fill="#527047">&#x0B95;&#x0BCA;&#x0B99;&#x0BCD;&#x0B95;&#x0BC1; &#x0BB5;&#x0B9F;&#x0BCD;&#x0B9F;&#x0BBE;&#xBB0; &#x0BB5;&#x0BB4;&#x0B95;&#x0BCD;&#x0B95;&#x0BC1; &#x0B85;&#x0B95;&#x0BB0;&#x0BBE;&#x0BA4;&#x0BBF;</text>
+<line x1="300" y1="310" x2="700" y2="310" stroke="#d5a45e" stroke-width="3"/>
+<text x="300" y="355" font-family="Segoe UI,sans-serif" font-size="21" fill="#a4530f">By Dharaneish &#x00B7; &#x0BA4;&#x0BB0;&#x0BA3;&#x0BC0;&#xBB7;&#xBCD;</text>
+</svg>

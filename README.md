@@ -265,10 +265,14 @@ assets/
   csv.js              RFC 4180 parser (quoted fields, embedded commas/newlines)
   render.js           pure HTML builders — no state, no side effects
   router.js           mirrors query/filters/open word into the URL
+  theme.js            light/dark theme, shared by all pages
+  register-sw.js      offline badge, install prompt, update banner
   styles.css          design tokens + components, light & dark
 data/entries.csv
 data/categories.csv
 data/sources.csv
+manifest.json
+sw.js
 images/
 ```
 
@@ -281,7 +285,8 @@ paint, not twenty.
 distinctions people mix up: ழ/ள/ல, ண/ந/ன, ற/ர, long vs short vowels, pulli, and on
 the Latin side `th`/`t`, `zh`/`l`, `ka`/`ga`, `sh`/`s`, `ch`/`c`, `ee`/`i`, `oo`/`u`,
 and doubled letters. Exact headword or variant matches are ranked first, followed by
-prefix, word-start, substring, and meaning matches;
+prefix, word-start, substring, and meaning matches. Result cards identify whether the
+winning match came from the headword, a variant, meaning, example, or note;
 with a subsequence pass as a last resort so a badly mistyped query still returns
 something. For the current dataset size this is a linear scan taking well under a millisecond, so
 there is no index to build or invalidate.
@@ -291,6 +296,10 @@ the word, its romanisation and a one-line gloss. Navigate with ↑/↓, open wit
 <kbd>Enter</kbd>, dismiss with <kbd>Esc</kbd>, or click. It reuses the same memoised
 result list as the grid below, so it costs nothing extra. Implemented with the ARIA
 combobox pattern (`role="combobox"`, `aria-activedescendant`, `role="listbox"`).
+
+**Offline & installability.** The service worker caches the app shell and CSV files for offline use. A parsed copy is also stored in IndexedDB; online loads remain network-first so new data is not silently hidden by an old cache. Saved and Recent lists are stored locally and remain available offline. The page shows network status and an Install app button when the browser offers installation. Installed copies check for updates on launch, reconnect, and return to the foreground; an Update available notice lets the user choose when to activate and reload the new version.
+
+**Pronunciation & sharing.** Open an entry to hear its headword through the browser Web Speech API (`ta-IN`). The detail view also offers native Web Share when available, falling back to the existing copy-link action. Open Graph/Twitter metadata use a 1200×630 PNG so WhatsApp and other link scrapers can render the site preview.
 
 **Accessibility & niceties.** Keyboard-first (<kbd>/</kbd> focuses search, <kbd>F</kbd>
 opens the filter drawer, <kbd>R</kbd> opens a random word, <kbd>Esc</kbd> clears),

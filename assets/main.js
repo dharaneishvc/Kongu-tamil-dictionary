@@ -1,10 +1,12 @@
 /** Application shell: wires DOM events to the store and the store to the DOM. */
-import { createStore, initialState, loadDataset, INITIAL_LIMIT, PAGE_SIZE } from './store.js';
-import { selectResults } from './selectors.js';
-import { activeFilterPills, categoryChips, entryCard, entryDetail, esc, suggestionItems } from './render.js';
-import { readUrl, shareUrl, writeUrl } from './router.js';
+import { createStore, initialState, loadDataset, saveList, INITIAL_LIMIT, PAGE_SIZE, STORAGE_KEYS } from './store.js?v=1';
+import { selectResults } from './selectors.js?v=1';
+import { suggestClosest } from './search.js?v=1';
+import { activeFilterPills, categoryChips, collectionEmptyState, emptyState, entryCard, entryDetail, esc, noResultsState, suggestionItems } from './render.js?v=1';
+import { readUrl, readWordId, shareUrl, writeUrl } from './router.js?v=1';
 
 const SUGGESTION_LIMIT = 8;
+const RECENT_LIMIT = 12;
 
 const el = {
   query: document.getElementById('q'),
@@ -14,34 +16,28 @@ const el = {
   categories: document.getElementById('categories'),
   sort: document.getElementById('sort'),
   filters: document.getElementById('filters'),
+  filterInputs: document.querySelectorAll('[data-filter]'),
   filterCount: document.getElementById('filter-count'),
   activeFilters: document.getElementById('active-filters'),
+  favoriteCount: document.getElementById('favorite-count'),
+  favorites: document.querySelector('[data-action="show-favorites"]'),
+  clearFavorites: document.querySelector('[data-action="clear-favorites"]'),
+  recent: document.querySelector('[data-action="show-recent"]'),
+  clearRecent: document.querySelector('[data-action="clear-recent"]'),
   status: document.getElementById('status'),
   results: document.getElementById('results'),
   sentinel: document.getElementById('sentinel'),
   viewAll: document.querySelector('[data-action="view-all"]'),
   detail: document.getElementById('detail'),
   meta: document.getElementById('dataset-meta'),
-  emptyTpl: document.getElementById('tpl-empty'),
 };
 
 const store = createStore(initialState);
 const byId = new Map();
 let suppressSuggestUntil = 0;
 
-/* ---------------------------------------------------------------- theme */
-
-const THEME_KEY = 'kongu.theme';
-
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  localStorage.setItem(THEME_KEY, theme);
-}
-
-applyTheme(
-  localStorage.getItem(THEME_KEY) ||
-    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-);
+/** Patch state that changes the result list, so paging starts over. */
+const refine = (partial) => store.patch({ ...partial, limit: INITIAL_LIMIT, viewAll: false });
 
 /* -------------------------------------------------------------- rendering */
 
@@ -51,7 +47,7 @@ let renderScheduled = false;
 const painted = {
   results: null, limit: 0, query: null,
   categories: null, category: null,
-  detailId: null,
+  detailId: null, detailFavorite: false,
 };
 
 function scheduleRender() {
@@ -66,17 +62,17 @@ function scheduleRender() {
 
 function render(state) {
   if (state.status === 'loading') {
-    el.status.textContent = 'Loading.. · தரவு ஏற்றப்படுகிறது…';
+    el.status.textContent = 'தரவு ஏற்றப்படுகிறது… · Loading…';
     el.results.innerHTML = skeletons(6);
     return;
   }
 
   if (state.status === 'error') {
     el.status.textContent = '';
-    el.results.innerHTML =
-      `<div class="empty"><p class="empty__title">Unable to load · தரவை ஏற்ற முடியவில்லை</p>` +
-      `<p class="muted">${esc(state.error)}</p>` +
-      `<button type="button" class="btn" data-action="retry">மீண்டும் முயற்சி · Retry</button></div>`;
+    el.results.innerHTML = emptyState(
+      'தரவை ஏற்ற முடியவில்லை · Unable to load',
+      `<p class="muted">${esc(state.error)}</p><button type="button" class="btn" data-action="retry">மீண்டும் முயற்சி · Retry</button>`,
+    );
     return;
   }
 
@@ -84,7 +80,7 @@ function render(state) {
   const shown = results.slice(0, state.limit);
 
   el.status.textContent = results.length
-    ? `${results.length.toLocaleString('ta-IN')} ${results.length === 1 ? 'சொல்' : 'சொற்கள்'}${
+    ? `${results.length.toLocaleString('ta-IN')} ${results.length === 1 ? 'சொல் · word' : 'சொற்கள் · words'}${
         state.query.trim() ? ` — “${state.query.trim()}”` : ''
       }`
     : '';
@@ -92,8 +88,10 @@ function render(state) {
   if (results !== painted.results || state.limit !== painted.limit || state.query !== painted.query) {
     if (results.length) {
       el.results.innerHTML = shown.map((entry) => entryCard(entry, state.query)).join('');
+    } else if (state.collection) {
+      el.results.innerHTML = collectionEmptyState(state.collection);
     } else {
-      el.results.replaceChildren(el.emptyTpl.content.cloneNode(true));
+      el.results.innerHTML = noResultsState(suggestClosest(state.entries, state.query));
     }
     painted.results = results;
     painted.limit = state.limit;
@@ -106,23 +104,30 @@ function render(state) {
     painted.category = state.category;
   }
 
-  if (el.viewAll) {
-    const canShowMore = shown.length < results.length;
-    el.viewAll.hidden = state.viewAll || !canShowMore;
-    el.viewAll.textContent = canShowMore
-      ? `அனைத்தையும் காண்க · View all (${results.length.toLocaleString('ta-IN')})`
-      : '';
-  }
+  const canShowMore = shown.length < results.length;
+  el.viewAll.hidden = state.viewAll || !canShowMore;
+  el.viewAll.textContent = canShowMore
+    ? `அனைத்தையும் காண்க · View all (${results.length.toLocaleString('ta-IN')})`
+    : '';
   el.sentinel.hidden = !state.viewAll || shown.length >= results.length;
   el.clear.hidden = !state.query;
 
   if (el.query.value !== state.query) el.query.value = state.query;
   if (el.sort.value !== state.sort) el.sort.value = state.sort;
 
+  el.favoriteCount.textContent = state.favorites.length ? `(${state.favorites.length})` : '';
+  renderCollectionButton(el.favorites, el.clearFavorites, state.collection === 'favorites', state.favorites.length);
+  renderCollectionButton(el.recent, el.clearRecent, state.collection === 'recent', state.recent.length);
   renderActiveFilters(state);
   renderSuggestions(state, results);
   syncDetail(state);
   writeUrl(state);
+}
+
+function renderCollectionButton(toggle, clear, active, count) {
+  toggle.classList.toggle('btn--primary', active);
+  toggle.setAttribute('aria-pressed', String(active));
+  clear.hidden = !(active && count > 0);
 }
 
 function renderActiveFilters(state) {
@@ -134,6 +139,7 @@ function renderActiveFilters(state) {
   el.filterCount.hidden = count === 0;
   el.filterCount.textContent = count;
   el.activeFilters.innerHTML = activeFilterPills(state);
+  el.filterInputs.forEach((input) => { input.checked = Boolean(state.filters[input.dataset.filter]); });
 }
 
 function renderSuggestions(state, results) {
@@ -163,12 +169,15 @@ function syncDetail(state) {
   const entry = state.selectedId ? byId.get(state.selectedId) : null;
   if (!entry) {
     painted.detailId = null;
+    painted.detailFavorite = false;
     if (el.detail.open) el.detail.close();
     return;
   }
-  if (painted.detailId !== entry.id) {
-    el.detail.innerHTML = entryDetail(entry);
+  const isFavorite = state.favorites.includes(entry.id);
+  if (painted.detailId !== entry.id || painted.detailFavorite !== isFavorite) {
+    el.detail.innerHTML = entryDetail(entry, isFavorite);
     painted.detailId = entry.id;
+    painted.detailFavorite = isFavorite;
   }
   if (!el.detail.open) el.detail.showModal();
 }
@@ -183,8 +192,52 @@ const debounce = (fn, wait) => {
   };
 };
 
+function speakEntry(entry) {
+  if (!entry || !window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') return;
+  window.speechSynthesis.cancel();
+  if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+  const utterance = new SpeechSynthesisUtterance(entry.word);
+  utterance.lang = 'ta-IN';
+  window.speechSynthesis.speak(utterance);
+}
+
+async function copyText(value) {
+  if (!navigator.clipboard?.writeText) return false;
+  await navigator.clipboard.writeText(value);
+  return true;
+}
+
+/** Briefly swap a button's label to confirm an action. */
+function flash(button, text, ms = 1500) {
+  const original = button.dataset.label ?? button.textContent;
+  button.dataset.label = original;
+  button.textContent = text;
+  clearTimeout(button.flashTimer);
+  button.flashTimer = setTimeout(() => { button.textContent = original; }, ms);
+}
+
+async function shareEntry(entry, button) {
+  if (!entry) return;
+  const url = shareUrl(entry);
+  try {
+    const shared = navigator.share
+      ? await navigator.share({ title: entry.word, text: entry.meanings[0] || '', url }).then(() => true)
+      : await copyText(url);
+    if (shared) flash(button, '✓ பகிரப்பட்டது · Shared');
+  } catch (error) {
+    if (error?.name !== 'AbortError') await copyText(url).catch(() => {});
+  }
+}
+
+async function copyLink(entry, button) {
+  if (!entry) return;
+  const url = shareUrl(entry);
+  const copied = await copyText(url).catch(() => false);
+  flash(button, copied ? '✓ நகலெடுக்கப்பட்டது · Copied' : url, copied ? 1500 : 6000);
+}
+
 const setQuery = debounce(
-  (value) => store.patch({ query: value, limit: INITIAL_LIMIT, viewAll: false, suggestOpen: true, suggestIndex: -1 }),
+  (value) => refine({ query: value, collection: '', suggestOpen: true, suggestIndex: -1 }),
   120
 );
 
@@ -208,13 +261,13 @@ el.query.addEventListener('keydown', (event) => {
     const active = el.suggestions.querySelector('.suggest__item--on');
     if (visible && active) {
       event.preventDefault();
-      store.patch({ selectedId: active.dataset.id, suggestOpen: false });
+      openEntry(active.dataset.id);
     } else {
       store.patch({ suggestOpen: false });
     }
   } else if (event.key === 'Escape') {
     if (visible) store.patch({ suggestOpen: false });
-    else if (el.query.value) store.patch({ query: '', limit: INITIAL_LIMIT, viewAll: false });
+    else if (el.query.value) refine({ query: '' });
   }
 });
 
@@ -223,7 +276,7 @@ el.suggestions.addEventListener('pointerdown', (event) => {
   const item = event.target.closest('.suggest__item[data-id]');
   if (!item) return;
   event.preventDefault();
-  store.patch({ selectedId: item.dataset.id, suggestOpen: false });
+  openEntry(item.dataset.id);
 });
 
 el.suggestions.addEventListener('pointermove', (event) => {
@@ -238,53 +291,40 @@ el.field.addEventListener('focusout', (event) => {
   store.patch({ suggestOpen: false });
 });
 
-el.sort.addEventListener('change', (event) =>
-  store.patch({ sort: event.target.value, limit: INITIAL_LIMIT, viewAll: false })
-);
+el.sort.addEventListener('change', (event) => refine({ sort: event.target.value }));
 
 el.categories.addEventListener('click', (event) => {
   const chip = event.target.closest('[data-category]');
   if (!chip) return;
   const next = chip.dataset.category;
-  store.patch({ category: next === store.get().category ? '' : next, limit: INITIAL_LIMIT, viewAll: false });
+  refine({ category: next === store.get().category ? '' : next });
 });
 
 el.activeFilters.addEventListener('click', (event) => {
   const pill = event.target.closest('[data-clear]');
   if (!pill) return;
   const { clear, value } = pill.dataset;
-  if (clear === 'category') store.patch({ category: '', limit: INITIAL_LIMIT, viewAll: false });
-  else if (clear === 'sort') store.patch({ sort: 'relevance', limit: INITIAL_LIMIT, viewAll: false });
-  else {
-    store.patch({
-      filters: { ...store.get().filters, [value]: false },
-      limit: INITIAL_LIMIT,
-      viewAll: false,
-    });
-    syncFilterInputs();
-  }
+  if (clear === 'category') refine({ category: '' });
+  else if (clear === 'sort') refine({ sort: 'relevance' });
+  else refine({ filters: { ...store.get().filters, [value]: false } });
 });
 
-function syncFilterInputs() {
-  const { filters } = store.get();
-  document
-    .querySelectorAll('[data-filter]')
-    .forEach((input) => (input.checked = Boolean(filters[input.dataset.filter])));
-}
-
-document.querySelectorAll('[data-filter]').forEach((input) => {
+el.filterInputs.forEach((input) => {
   input.addEventListener('change', () => {
-    store.patch({
-      filters: { ...store.get().filters, [input.dataset.filter]: input.checked },
-      limit: INITIAL_LIMIT,
-      viewAll: false,
-    });
+    refine({ filters: { ...store.get().filters, [input.dataset.filter]: input.checked } });
   });
 });
 
+function openEntry(id) {
+  const recent = [id, ...store.get().recent.filter((value) => value !== id)].slice(0, RECENT_LIMIT);
+  saveList(STORAGE_KEYS.recent, recent);
+  store.patch({ selectedId: id, recent, suggestOpen: false });
+}
+
 el.results.addEventListener('click', (event) => {
+  if (event.target.closest('[data-action]')) return;
   const card = event.target.closest('.card[data-id]');
-  if (card) store.patch({ selectedId: card.dataset.id });
+  if (card) openEntry(card.dataset.id);
 });
 
 el.results.addEventListener('keydown', (event) => {
@@ -292,7 +332,7 @@ el.results.addEventListener('keydown', (event) => {
   const card = event.target.closest('.card[data-id]');
   if (!card) return;
   event.preventDefault();
-  store.patch({ selectedId: card.dataset.id });
+  openEntry(card.dataset.id);
 });
 
 el.detail.addEventListener('close', () => {
@@ -300,30 +340,50 @@ el.detail.addEventListener('close', () => {
   store.patch({ selectedId: null, suggestOpen: false });
 });
 
-el.detail.addEventListener('click', async (event) => {
-  if (event.target === el.detail) {
-    el.detail.close();
-    return;
-  }
-  const copy = event.target.closest('[data-action="copy-link"]');
-  if (!copy) return;
-  const entry = byId.get(copy.dataset.id);
-  try {
-    await navigator.clipboard.writeText(shareUrl(entry));
-    copy.textContent = '✓ நகலெடுக்கப்பட்டது · Copied';
-    setTimeout(() => (copy.textContent = '🔗 இணைப்பை நகலெடு · Copy'), 1600);
-  } catch {
-    copy.textContent = shareUrl(entry);
-  }
+el.detail.addEventListener('click', (event) => {
+  if (event.target === el.detail) el.detail.close();
 });
 
+function toggleCollection(name) {
+  refine({ collection: store.get().collection === name ? '' : name, query: '', category: '' });
+}
+
+function clearCollection(name) {
+  saveList(STORAGE_KEYS[name], []);
+  refine({ [name]: [], collection: '', query: '', suggestOpen: false });
+}
+
+function toggleFavorite(id) {
+  const { favorites } = store.get();
+  const next = favorites.includes(id) ? favorites.filter((value) => value !== id) : [id, ...favorites];
+  saveList(STORAGE_KEYS.favorites, next);
+  store.patch({ favorites: next });
+}
+
 document.addEventListener('click', (event) => {
-  const action = event.target.closest('[data-action]')?.dataset.action;
-  if (action === 'clear') {
-    store.patch({ query: '', limit: INITIAL_LIMIT, viewAll: false, suggestOpen: false });
+  const actionElement = event.target.closest('[data-action]');
+  const action = actionElement?.dataset.action;
+  if (action === 'use-suggestion') {
+    refine({ query: actionElement.dataset.query, collection: '', suggestOpen: false });
+  } else if (action === 'show-favorites') {
+    toggleCollection('favorites');
+  } else if (action === 'show-recent') {
+    toggleCollection('recent');
+  } else if (action === 'clear-favorites') {
+    clearCollection('favorites');
+  } else if (action === 'clear-recent') {
+    clearCollection('recent');
+  } else if (action === 'toggle-favorite') {
+    toggleFavorite(actionElement.dataset.id);
+  } else if (action === 'speak') {
+    speakEntry(byId.get(actionElement.dataset.id));
+  } else if (action === 'share') {
+    shareEntry(byId.get(actionElement.dataset.id), actionElement);
+  } else if (action === 'copy-link') {
+    copyLink(byId.get(actionElement.dataset.id), actionElement);
+  } else if (action === 'clear') {
+    refine({ query: '', suggestOpen: false });
     el.query.focus();
-  } else if (action === 'theme') {
-    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   } else if (action === 'random') {
     showRandom();
   } else if (action === 'filters') {
@@ -331,15 +391,7 @@ document.addEventListener('click', (event) => {
   } else if (action === 'close-filters') {
     el.filters.close();
   } else if (action === 'reset') {
-    store.patch({
-      query: '',
-      category: '',
-      sort: 'relevance',
-      filters: { ...initialState.filters },
-      limit: INITIAL_LIMIT,
-      viewAll: false,
-    });
-    syncFilterInputs();
+    refine({ query: '', category: '', collection: '', sort: 'relevance', filters: { ...initialState.filters } });
   } else if (action === 'view-all') {
     store.patch({ viewAll: true, limit: PAGE_SIZE });
   } else if (action === 'retry') {
@@ -347,11 +399,17 @@ document.addEventListener('click', (event) => {
   }
 });
 
+document.addEventListener('error', (event) => {
+  if (event.target.matches?.('.card__thumb, .detail__image')) event.target.hidden = true;
+}, true);
+
 el.filters.addEventListener('click', (event) => {
   if (event.target === el.filters) el.filters.close();
 });
 
 document.addEventListener('keydown', (event) => {
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName);
   const busy = el.detail.open || el.filters.open;
 
@@ -359,8 +417,6 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     el.query.focus();
     el.query.select();
-  } else if (event.key === 'Escape' && typing && el.query.value) {
-    store.patch({ query: '', limit: INITIAL_LIMIT, viewAll: false });
   } else if ((event.key === 'r' || event.key === 'R') && !typing && !busy) {
     showRandom();
   } else if ((event.key === 'f' || event.key === 'F') && !typing && !busy) {
@@ -370,10 +426,12 @@ document.addEventListener('keydown', (event) => {
 });
 
 function showRandom() {
-  const pool = selectResults(store.get());
-  if (!pool.length) return;
-  const entry = pool[Math.floor(Math.random() * pool.length)];
-  store.patch({ selectedId: entry.id });
+  const state = store.get();
+  const pool = selectResults(state);
+  const list = pool.length ? pool : state.entries;
+  if (!list.length) return;
+  const entry = list[Math.floor(Math.random() * list.length)];
+  openEntry(entry.id);
 }
 
 new IntersectionObserver(
@@ -388,8 +446,8 @@ new IntersectionObserver(
 ).observe(el.sentinel);
 
 addEventListener('hashchange', () => {
-  const id = location.hash.replace(/^#\/?w\//, '');
-  store.patch({ selectedId: byId.has(id) ? id : null });
+  const id = readWordId();
+  store.patch({ selectedId: id && byId.has(id) ? id : null });
 });
 
 /* ----------------------------------------------------------------- boot */
@@ -402,7 +460,14 @@ async function loadData() {
   store.patch({ status: 'loading', error: null });
   try {
     const { meta, entries, categories } = await loadDataset();
+    byId.clear();
     entries.forEach((entry) => byId.set(entry.id, entry));
+
+    const { favorites: savedFavorites, recent: savedRecent } = store.get();
+    const favorites = savedFavorites.filter((id) => byId.has(id));
+    const recent = savedRecent.filter((id) => byId.has(id));
+    if (favorites.length !== savedFavorites.length) saveList(STORAGE_KEYS.favorites, favorites);
+    if (recent.length !== savedRecent.length) saveList(STORAGE_KEYS.recent, recent);
 
     const fromUrl = readUrl();
     const filters = { ...initialState.filters };
@@ -418,21 +483,21 @@ async function loadData() {
       status: 'ready',
       entries,
       categories,
+      favorites,
+      recent,
       query: fromUrl.query,
       category: resolvedCategory,
       filters,
       sort: ['relevance', 'alpha', 'richest'].includes(fromUrl.sort) ? fromUrl.sort : 'relevance',
       selectedId: byId.has(fromUrl.selectedId) ? fromUrl.selectedId : null,
     });
-    syncFilterInputs();
 
-    if (el.meta) {
-      el.meta.textContent =
-        `${meta.total.toLocaleString('ta-IN')} சொற்கள் total words · ` +
-        `${meta.withExample} எடுத்துக்காட்டுகள் with Examples · ` +
-        `${meta.withEnglish} ஆங்கிலப் பொருள் with English meaning · ` +
-        `${meta.needsMeaning} பொருள் தேவை without meaning · `;
-    }
+    el.meta.textContent = [
+      `${meta.total.toLocaleString('ta-IN')} சொற்கள் · words`,
+      `${meta.withExample.toLocaleString('ta-IN')} எடுத்துக்காட்டுடன் · with examples`,
+      `${meta.withEnglish.toLocaleString('ta-IN')} ஆங்கிலப் பொருளுடன் · with English meaning`,
+      `${meta.needsMeaning.toLocaleString('ta-IN')} பொருள் தேவை · need a meaning`,
+    ].join(' • ');
   } catch (error) {
     store.patch({ status: 'error', error: error.message || 'Unknown data loading error' });
   }

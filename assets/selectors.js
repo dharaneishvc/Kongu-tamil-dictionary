@@ -3,7 +3,7 @@
  * Memoised per entries array on a cheap signature so scrolling/paging never
  * re-runs the search and separate stores cannot share stale results.
  */
-import { queryKeys, scoreEntry } from './search.js';
+import { matchEntry, queryKeys } from './search.js?v=1';
 
 const cacheByEntries = new WeakMap();
 
@@ -19,7 +19,7 @@ function signatureOf(state) {
     .filter(([, on]) => on)
     .map(([name]) => name)
     .join(',');
-  return [state.entries.length, state.query.trim(), state.category, state.sort, active].join('\u0000');
+  return [state.entries.length, state.query.trim(), state.category, state.collection, state.favorites.join(','), state.recent.join(','), state.sort, active].join('\u0000');
 }
 
 function richness(entry) {
@@ -47,12 +47,14 @@ export function selectResults(state) {
 
   for (const entry of state.entries) {
     if (state.category && !entry.categories.includes(state.category)) continue;
+    if (state.collection === 'favorites' && !state.favorites.includes(entry.id)) continue;
+    if (state.collection === 'recent' && !state.recent.includes(entry.id)) continue;
     if (activeFilters.some((matches) => !matches(entry))) continue;
 
     if (searching) {
-      const score = scoreEntry(entry, keys);
+      const { score, reason } = matchEntry(entry, keys);
       if (score === 0) continue;
-      scored.push({ entry, score });
+      scored.push({ entry, score, reason });
     } else {
       scored.push({ entry, score: 0 });
     }
@@ -67,7 +69,9 @@ export function selectResults(state) {
     scored.sort((a, b) => b.score - a.score || byAlpha(a, b));
   }
 
-  const results = scored.map((item) => item.entry);
+  const results = scored.map((item) => (
+    searching ? { ...item.entry, matchReason: item.reason } : item.entry
+  ));
   cacheByEntries.set(state.entries, { signature, results });
   return results;
 }

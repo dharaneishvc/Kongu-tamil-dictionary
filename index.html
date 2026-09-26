@@ -8,22 +8,33 @@
 <meta name="theme-color" content="#7a3d12">
 
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/">
 <meta property="og:title" content="கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary">
 <meta property="og:description" content="An open, community-built dictionary of the Kongu Tamil dialect. Search in Tamil script, Latin transliteration, or English meaning.">
+<meta property="og:image" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/assets/og-preview.png?v=1">
+<meta property="og:image:secure_url" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/assets/og-preview.png?v=1">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kongu Tamil Dialect Dictionary">
+<meta property="og:locale" content="ta_IN">
+<meta property="og:locale:alternate" content="en_US">
 <meta property="og:site_name" content="Kongu Tamil Dialect Dictionary">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary">
+<meta name="twitter:image" content="https://dharaneishvc.github.io/Kongu-tamil-dictionary/assets/og-preview.png?v=1">
+<meta name="twitter:image:alt" content="Kongu Tamil Dialect Dictionary">
 <meta name="twitter:description" content="An open, community-built dictionary of the Kongu Tamil dialect. Search in Tamil script, Latin transliteration, or English meaning.">
-<link rel="canonical" href="https://dharaneishvc.github.io/Kongu-tamil-dictionary/">
-<meta name="keywords" content="Kongu Tamil, Dictionary, Dialect, Tamil, கொங்கு தமிழ், அகராதி, Kongu region">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="canonical" href="./">
+<meta name="keywords" content="Kongu Tamil, Kongu Tamil Dictionary, Dialect, Tamil, கொங்கு தமிழ், கொங்கு அகராதி, Kongu region">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Dataset",
   "name": "Kongu Tamil Dialect Dictionary",
   "description": "An open, community-built dictionary of the Kongu Tamil dialect. Search in Tamil script, Latin transliteration, or English meaning.",
-  "url": "https://dharaneishvc.github.io/Kongu-tamil-dictionary/",
+  "url": "./",
   "creator": {
     "@type": "Person",
     "name": "Dharaneish V C",
@@ -34,16 +45,17 @@
 }
 </script>
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E0%AE%95%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/styles.css?v=2">
+<link rel="icon" href="assets/icon.svg">
+<link rel="stylesheet" href="assets/styles.css?v=1">
+<script src="assets/theme.js?v=1"></script>
 </head>
 <body>
-<a class="skip-link" href="#results">உள்ளடக்கத்திற்குச் செல்</a>
+<a class="skip-link" href="#results">உள்ளடக்கத்திற்குச் செல் · Skip to content</a>
 
 <header class="masthead">
   <div class="shell masthead__inner">
     <div class="brand">
-      <span class="brand__mark" aria-hidden="true">க</span>
+      <img class="brand__icon" src="assets/icon.svg" alt="">
       <span class="brand__text">
         <strong>கொங்கு வட்டார வழக்கு அகராதி</strong>
         <small>Kongu Tamil Dialect Dictionary</small>
@@ -65,7 +77,7 @@
 
 <main class="shell">
   <h1 class="visually-hidden">கொங்கு வட்டார வழக்கு அகராதி · Kongu Tamil Dialect Dictionary</h1>
-  <section class="search" aria-label="தேடல்">
+  <section class="search" aria-label="தேடல் · Search">
     <div class="search__field">
       <div class="search__box">
         <span class="search__icon" aria-hidden="true">⌕</span>
@@ -73,13 +85,14 @@
           id="q"
           type="search"
           class="search__input"
+          aria-label="சொல் தேடல் · Search for a word"
           placeholder="தமிழ், Latin ஒலிபெயர்ப்பு, அல்லது English meaning — எ.கா. பொடக்காலி / podakkaali / backyard"
           autocomplete="off" autocapitalize="off" spellcheck="false"
           role="combobox" aria-expanded="false" aria-autocomplete="list"
           aria-controls="suggestions" aria-describedby="search-hint">
-        <button type="button" class="search__clear" data-action="clear" aria-label="தேடலை அழி" hidden>✕</button>
+        <button type="button" class="search__clear" data-action="clear" aria-label="தேடலை அழி · Clear search" hidden>✕</button>
       </div>
-      <ul id="suggestions" class="suggest" role="listbox" aria-label="பரிந்துரைகள்" hidden></ul>
+      <ul id="suggestions" class="suggest" role="listbox" aria-label="பரிந்துரைகள் · Suggestions" hidden></ul>
     </div>
     <p id="search-hint" class="search__hint">
       தமிழ் எழுத்து, Latin ஒலிபெயர்ப்பு (<code>zh/l</code>, <code>th/t</code>, <code>ka/ga</code> வேறுபாடின்றி), அல்லது English meaning மூலம் தேடலாம்.
@@ -93,12 +106,32 @@
       <span aria-hidden="true">⚙</span> வடிகட்டி &amp; வரிசை · Filter &amp; sort
       <span class="btn__badge" id="filter-count" hidden></span>
     </button>
-    <div class="active-filters" id="active-filters" aria-label="செயலில் உள்ள வடிகட்டிகள்"></div>
+    <div class="active-filters" id="active-filters" aria-label="செயலில் உள்ள வடிகட்டிகள் · Active filters"></div>
+    <button type="button" class="btn btn--ghost" data-action="show-favorites" aria-pressed="false">சேமித்தவை · Saved <span id="favorite-count"></span></button>
+    <button type="button" class="btn btn--ghost" data-action="clear-favorites" aria-label="சேமித்தவற்றை நீக்கு · Clear saved" hidden>சேமித்தவற்றை நீக்கு · Clear saved</button>
+    <button type="button" class="btn btn--ghost" data-action="show-recent" aria-pressed="false">சமீபம் · Recent</button>
+    <button type="button" class="btn btn--ghost" data-action="clear-recent" aria-label="சமீபங்களை நீக்கு · Clear recent" hidden>சமீபங்களை நீக்கு · Clear recent</button>
   </section>
+
+  <section class="pwa-tools" aria-label="செயலி நிலை · App status">
+    <span id="network-status" class="network-status" role="status" aria-live="polite">
+      <span class="network-status__dot" aria-hidden="true"></span>
+      <span data-network-label>இணையத்தில் · Online</span>
+    </span>
+    <button type="button" class="btn btn--ghost" data-action="install-app" hidden>செயலியை நிறுவு · Install app</button>
+  </section>
+
+  <aside id="update-notice" class="update-notice" role="status" aria-live="polite" hidden>
+    <span>புதிய பதிப்பு உள்ளது · Update available</span>
+    <span class="update-notice__actions">
+      <button type="button" class="btn btn--primary" data-action="apply-update">இப்போது புதுப்பி · Update now</button>
+      <button type="button" class="btn btn--ghost" data-action="dismiss-update">பிறகு · Later</button>
+    </span>
+  </aside>
 
   <p class="status" id="status" role="status" aria-live="polite"></p>
 
-  <section id="results" class="results" tabindex="-1" aria-label="முடிவுகள்"></section>
+  <section id="results" class="results" tabindex="-1" aria-label="முடிவுகள் · Results"></section>
 
   <div id="sentinel" class="sentinel" aria-hidden="true"></div>
 
@@ -156,9 +189,9 @@
   </div>
 </footer>
 
-<dialog id="detail" class="detail" aria-label="சொல் விவரம்"></dialog>
+<dialog id="detail" class="detail" aria-label="சொல் விவரம் · Word details"></dialog>
 
-<dialog id="filters" class="drawer" aria-label="வடிகட்டி மற்றும் வரிசை">
+<dialog id="filters" class="drawer" aria-label="வடிகட்டி மற்றும் வரிசை · Filter and sort">
   <form method="dialog" class="drawer__head">
     <h2>வடிகட்டி &amp; வரிசை <span class="muted">· Filter &amp; sort</span></h2>
     <button class="drawer__close" value="close" aria-label="மூடு · Close">✕</button>
@@ -167,25 +200,25 @@
   <div class="drawer__body">
     <section class="drawer__group">
       <h3>பிரிவு · Category</h3>
-      <div class="chips chips--stack" id="categories" role="group" aria-label="பிரிவுகள்"></div>
+      <div class="chips chips--stack" id="categories" role="group" aria-label="பிரிவுகள் · Categories"></div>
     </section>
 
     <section class="drawer__group">
       <h3>கூடுதல் வடிகட்டிகள் · More filters</h3>
       <div class="toggles">
-        <label class="toggle"><input type="checkbox" data-filter="examples"> எடுத்துக்காட்டு உள்ளவை</label>
-        <label class="toggle"><input type="checkbox" data-filter="english"> ஆங்கிலப் பொருள் உள்ளவை</label>
-        <label class="toggle"><input type="checkbox" data-filter="images"> படம் உள்ளவை</label>
-        <label class="toggle"><input type="checkbox" data-filter="undocumented"> பொருள் தேவை</label>
+        <label class="toggle"><input type="checkbox" data-filter="examples"> எடுத்துக்காட்டு உள்ளவை · Has example</label>
+        <label class="toggle"><input type="checkbox" data-filter="english"> ஆங்கிலப் பொருள் உள்ளவை · Has English</label>
+        <label class="toggle"><input type="checkbox" data-filter="images"> படம் உள்ளவை · Has image</label>
+        <label class="toggle"><input type="checkbox" data-filter="undocumented"> பொருள் தேவை · Needs meaning</label>
       </div>
     </section>
 
     <section class="drawer__group">
-      <h3>வரிசை · Sort</h3>
+      <h3 id="sort-heading">வரிசை · Sort</h3>
       <label class="select">
-        <select id="sort">
+        <select id="sort" aria-labelledby="sort-heading">
           <option value="relevance">பொருத்தம் · Relevance</option>
-          <option value="alpha">அகர வரிசை · A–Z</option>
+          <option value="alpha">அகர வரிசை · A-Z</option>
           <option value="richest">விவரம் நிறைந்தவை · Richest</option>
         </select>
       </label>
@@ -198,25 +231,19 @@
   </footer>
 </dialog>
 
-<template id="tpl-empty">
-  <div class="empty">
-    <p class="empty__title">முடிவுகள் இல்லை</p>
-    <p class="muted">எழுத்துப்பிழை இருக்கலாம் — வேறு வடிவத்தில் முயற்சிக்கவும், அல்லது வடிகட்டிகளை நீக்கவும்.</p>
-    <button type="button" class="btn" data-action="reset">வடிகட்டிகளை நீக்கு</button>
-  </div>
-</template>
-
-<script type="module" src="assets/main.js?v=3"></script>
+<script type="module" src="assets/main.js?v=1"></script>
+<script src="assets/register-sw.js?v=1"></script>
 <script>
   // Modules and fetch() are both blocked on file:// — say so instead of showing a blank page.
   if (location.protocol === 'file:') {
     document.getElementById('results').innerHTML =
       '<div class="empty">' +
-      '<p class="empty__title">ஒரு சிறிய சேவையகம் தேவை</p>' +
+      '<p class="empty__title">ஒரு சிறிய சேவையகம் தேவை · A local server is needed</p>' +
       '<p class="muted">உலாவிகள் <code>file://</code> முகவரியில் தரவுக் கோப்பைப் படிக்க அனுமதிப்பதில்லை. ' +
       'இந்தக் கோப்புறையில் கீழ்க்கண்ட கட்டளையை இயக்கி <code>http://localhost:8000</code> திறக்கவும்:</p>' +
       '<pre class="guide__code"><code>python -m http.server 8000</code></pre>' +
       '<p class="muted">இணையத்தில் ஏற்றியபின் (GitHub Pages போன்றவை) இது தானாகவே வேலை செய்யும்.</p>' +
+      '<p class="muted">Browsers block reading data files over <code>file://</code>. Run the command above in this folder and open <code>http://localhost:8000</code>.</p>' +
       '</div>';
     document.getElementById('status').textContent = '';
   }

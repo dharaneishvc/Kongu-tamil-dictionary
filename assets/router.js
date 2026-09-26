@@ -2,15 +2,19 @@
 
 const KEYS = ['q', 'cat', 'f', 'sort', 'w'];
 
+/** Word id from a `#/w/<id>` link; other hashes (e.g. the skip link) are ignored. */
+export function readWordId() {
+  return location.hash.match(/^#\/?w\/([^?&]+)/)?.[1] || null;
+}
+
 export function readUrl() {
   const params = new URLSearchParams(location.search);
-  const hash = location.hash.replace(/^#\/?w\//, '');
   return {
     query: params.get('q') || '',
     category: params.get('cat') || '',
     filters: (params.get('f') || '').split(',').filter(Boolean),
     sort: params.get('sort') || 'relevance',
-    selectedId: hash || params.get('w') || null,
+    selectedId: readWordId() || params.get('w') || null,
   };
 }
 
